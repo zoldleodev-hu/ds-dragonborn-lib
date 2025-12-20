@@ -1,0 +1,32 @@
+{
+  "required": true,
+  "package": "hu.zoldleo.dragonborn.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "mixins": [
+    "DragonRidingHandlerMixin",
+    "DragonSizeHandlerMixin",
+    "EntityMixin",
+    "LivingEntityMixin",
+    "PlayerMixin",
+    "RequestOpenDragonInventoryMixin",
+    "SortingHandlerMixin"
+  ],
+  "client": [
+    "client.ClientDragonRendererMixin",
+    "client.ClientFlightHandlerMixin",
+    "client.DragonAltarScreenMixin",
+    "client.DragonEditorHandlerMixin",
+    "client.DragonModelMixin",
+    "client.DragonSurvivalClientMixin",
+    "client.InventoryScreenMixin",
+    "client.ItemInHandRendererMixin",
+    "client.LevelRendererMixin",
+    "client.LivingEntityRendererMixin",
+    "client.PlayerRendererMixin",
+    "client.SmithingScreenMixin"
+  ],
+  "injectors": {
+    "maxShiftBy": 2
+  }
+}
