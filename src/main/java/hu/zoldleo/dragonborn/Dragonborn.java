@@ -5,25 +5,19 @@ import by.dragonsurvivalteam.dragonsurvival.registry.dragon.DragonSpecies;
 import by.dragonsurvivalteam.dragonsurvival.registry.dragon.body.DragonBody;
 import hu.zoldleo.dragonborn.registry.DragonbornContainers;
 import hu.zoldleo.dragonborn.registry.DragonbornEntities;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 
 @Mod(Dragonborn.MODID)
 public class Dragonborn {
     public static final String MODID = "dragonborn_lib";
-    public static final TagKey<DragonSpecies> DRAGONBORN_SPECIES = TagKey.create(DragonSpecies.REGISTRY, res("dragonborn_species"));
-    public static final TagKey<DragonBody> DRAGONBORN_BODIES = TagKey.create(DragonBody.REGISTRY, res("dragonborn_bodies"));
+    public static final TagKey<DragonSpecies> DRAGONBORN_SPECIES = TagKey.create(DragonSpecies.REGISTRY, DragonSurvival.res("dragonborn_species"));
+    public static final TagKey<DragonBody> DRAGONBORN_BODIES = TagKey.create(DragonBody.REGISTRY, DragonSurvival.res("dragonborn_bodies"));
 
-    public Dragonborn(IEventBus modEventBus, ModContainer modContainer) {
+    public Dragonborn(IEventBus modEventBus) {
         DragonbornEntities.REGISTRY.register(modEventBus);
         DragonbornContainers.REGISTRY.register(modEventBus);
-    }
-
-    public static ResourceLocation res(final String path) {
-        return DragonSurvival.location(Dragonborn.MODID, path);
     }
 }
 
