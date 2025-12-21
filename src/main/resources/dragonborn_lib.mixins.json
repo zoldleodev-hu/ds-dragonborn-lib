@@ -6,6 +6,7 @@
   "mixins": [
     "DragonRidingHandlerMixin",
     "DragonSizeHandlerMixin",
+    "DragonSoulItemMixin",
     "EntityMixin",
     "LivingEntityMixin",
     "PlayerMixin",
