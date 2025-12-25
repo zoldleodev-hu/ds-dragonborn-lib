@@ -18,6 +18,7 @@
     "client.ClientFlightHandlerMixin",
     "client.DragonAltarScreenMixin",
     "client.DragonEditorHandlerMixin",
+    "client.DragonEditorScreenMixin",
     "client.DragonModelMixin",
     "client.DragonSurvivalClientMixin",
     "client.InventoryScreenMixin",
