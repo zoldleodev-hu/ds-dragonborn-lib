@@ -45,12 +45,12 @@ public class DragonbornEntityRenderer extends GeoEntityRenderer<DragonbornEntity
     }
 
     private void copyTRSData(ModelPart root, GeoBone bone) {
-        bone.setPosX(root.x);
+        bone.setPosX(-root.x);
         bone.setPosY(-root.y);
         bone.setPosZ(root.z);
         bone.setRotX(-root.xRot);
         bone.setRotY(root.yRot);
-        bone.setRotZ(root.zRot);
+        bone.setRotZ(-root.zRot);
         bone.setScaleX(root.xScale);
         bone.setScaleY(root.yScale);
         bone.setScaleZ(root.zScale);
@@ -62,7 +62,7 @@ public class DragonbornEntityRenderer extends GeoEntityRenderer<DragonbornEntity
                                @Nullable VertexConsumer buffer, boolean isReRender, float partialTick,
                                int packedLight, int packedOverlay, int colour) {
         Player player = animatable.getPlayer();
-        if (player == null || player.isSpectator() || player.isInvisibleTo(Minecraft.getInstance().player)) {
+        if (player == null || player.isSpectator() || Minecraft.getInstance().player == null || player.isInvisibleTo(Minecraft.getInstance().player)) {
             return;
         }
         super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
