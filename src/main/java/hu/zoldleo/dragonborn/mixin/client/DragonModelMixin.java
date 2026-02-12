@@ -10,6 +10,8 @@ import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
 import by.dragonsurvivalteam.dragonsurvival.registry.datagen.Translation;
 import hu.zoldleo.dragonborn.Dragonborn;
+import hu.zoldleo.dragonborn.client.DragonbornClient;
+import hu.zoldleo.dragonborn.mixin.DragonStateHandlerAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -38,7 +40,9 @@ public abstract class DragonModelMixin extends GeoModel<DragonEntity> {
                 if (handler == DragonEditorScreen.HANDLER && Minecraft.getInstance().player instanceof LocalPlayer local) {
                     player = local;
                 }
-                if (player.getSkin().model() == PlayerSkin.Model.SLIM)
+                PlayerSkin fakeSkin = ((DragonStateHandlerAccessor)handler).dragonborn$getFakeSkin();
+                PlayerSkin skin = (fakeSkin == null) ? player.getSkin() : fakeSkin;
+                if (skin.model() == PlayerSkin.Model.SLIM)
                     model = handler.getModel().withSuffix("_slim");
                 model = model.withPrefix("geo/").withSuffix(".geo.json");
                 try {

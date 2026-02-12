@@ -1,6 +1,9 @@
 package hu.zoldleo.dragonborn.client;
 
+import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
+import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateProvider;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
+import by.dragonsurvivalteam.dragonsurvival.registry.dragon.body.DragonBody;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import hu.zoldleo.dragonborn.common.DragonbornEntity;
@@ -65,6 +68,14 @@ public class DragonbornEntityRenderer extends GeoEntityRenderer<DragonbornEntity
         if (player == null || player.isSpectator() || Minecraft.getInstance().player == null || player.isInvisibleTo(Minecraft.getInstance().player)) {
             return;
         }
+
+        DragonStateHandler handler = DragonStateProvider.getData(player);
+        boolean hasWings = !(handler.body().value()).canHideWings() || handler.getCurrentStageCustomization().wings;
+
+        for(String boneName : (handler.body().value()).bonesToHideForToggle()) {
+            model.getBone(boneName).ifPresent((bone) -> bone.setHidden(!hasWings));
+        }
+
         super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
         player.getData(DSDataAttachments.DRAGON_HANDLER).refreshBody = false;
     }
