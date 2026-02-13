@@ -1,11 +1,8 @@
 package hu.zoldleo.dragonborn.mixin.client;
 
 import by.dragonsurvivalteam.dragonsurvival.client.render.blocks.DragonSoulRenderer;
-import by.dragonsurvivalteam.dragonsurvival.client.util.FakeClientPlayer;
 import by.dragonsurvivalteam.dragonsurvival.server.tileentity.DragonSoulBlockEntity;
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hu.zoldleo.dragonborn.client.DragonbornClient;
 import hu.zoldleo.dragonborn.mixin.DragonStateHandlerAccessor;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;

@@ -7,17 +7,11 @@ import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler
 import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import hu.zoldleo.dragonborn.client.DragonbornClient;
+import com.mojang.blaze3d.vertex.*;
 import hu.zoldleo.dragonborn.mixin.DragonStateHandlerAccessor;
-import hu.zoldleo.dragonborn.mixin.DragonStateHandlerMixin;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -47,7 +41,6 @@ public class DragonEditorHandlerMixin {
                 PlayerSkin fakeSkin = ((DragonStateHandlerAccessor)(handler)).dragonborn$getFakeSkin();
                 PlayerSkin skin = (fakeSkin == null) ? player.getSkin() : fakeSkin;
                 AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(skin.texture());
-                //((DragonStateHandlerAccessor)(handler)).dragonborn$setFakeSkin(null);
 
                 if (handler == DragonEditorScreen.HANDLER && Minecraft.getInstance().player instanceof LocalPlayer local)
                     texture = Minecraft.getInstance().getTextureManager().getTexture(local.getSkin().texture());

@@ -3,7 +3,6 @@ package hu.zoldleo.dragonborn.client;
 import hu.zoldleo.dragonborn.Dragonborn;
 import hu.zoldleo.dragonborn.registry.DragonbornEntities;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.client.resources.PlayerSkin;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;

@@ -1,9 +1,7 @@
 package hu.zoldleo.dragonborn.client;
 
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
-import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateProvider;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
-import by.dragonsurvivalteam.dragonsurvival.registry.dragon.body.DragonBody;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import hu.zoldleo.dragonborn.common.DragonbornEntity;
@@ -69,7 +67,7 @@ public class DragonbornEntityRenderer extends GeoEntityRenderer<DragonbornEntity
             return;
         }
 
-        DragonStateHandler handler = DragonStateProvider.getData(player);
+        DragonStateHandler handler = player.getData(DSDataAttachments.DRAGON_HANDLER);
         boolean hasWings = !(handler.body().value()).canHideWings() || handler.getCurrentStageCustomization().wings;
 
         for(String boneName : (handler.body().value()).bonesToHideForToggle()) {
@@ -77,6 +75,6 @@ public class DragonbornEntityRenderer extends GeoEntityRenderer<DragonbornEntity
         }
 
         super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
-        player.getData(DSDataAttachments.DRAGON_HANDLER).refreshBody = false;
+        handler.refreshBody = false;
     }
 }

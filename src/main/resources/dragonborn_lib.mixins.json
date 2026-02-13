@@ -22,6 +22,7 @@
     "client.DragonEditorHandlerMixin",
     "client.DragonEditorScreenMixin",
     "client.DragonModelMixin",
+    "client.DragonRendererMixin",
     "client.DragonSoulRendererMixin",
     "client.DragonSurvivalClientMixin",
     "client.InventoryScreenMixin",

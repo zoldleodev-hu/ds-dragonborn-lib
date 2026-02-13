@@ -10,7 +10,6 @@ import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
 import by.dragonsurvivalteam.dragonsurvival.registry.datagen.Translation;
 import hu.zoldleo.dragonborn.Dragonborn;
-import hu.zoldleo.dragonborn.client.DragonbornClient;
 import hu.zoldleo.dragonborn.mixin.DragonStateHandlerAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
