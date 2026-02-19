@@ -9,6 +9,8 @@ import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateProvide
 import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
 import by.dragonsurvivalteam.dragonsurvival.registry.datagen.Translation;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import hu.zoldleo.dragonborn.Dragonborn;
 import hu.zoldleo.dragonborn.mixin.DragonStateHandlerAccessor;
 import net.minecraft.client.Minecraft;
@@ -53,5 +55,12 @@ public abstract class DragonModelMixin extends GeoModel<DragonEntity> {
                 }
             }
         }
+    }
+
+    @ModifyExpressionValue(method = "getTextureResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/ResourceLocation;equals(Ljava/lang/Object;)Z"))
+    private boolean asd(boolean original, @Local DragonStateHandler handler) {
+        if (handler.body().is(Dragonborn.CAN_USE_CUSTOM_SKIN))
+            return true;
+        return original;
     }
 }

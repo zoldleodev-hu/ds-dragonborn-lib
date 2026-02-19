@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(DragonFoodHandler.class)
 public class DragonFoodHandlerMixin {
     @ModifyReturnValue(method = "getDragonFoodProperties", at = @At(value = "RETURN", ordinal = 3))
-    private static @Nullable FoodProperties asd(@Nullable FoodProperties dsOriginal, @Local(argsOnly = true) Holder<DragonSpecies> species, @Local(argsOnly = true) FoodProperties original) {
+    private static @Nullable FoodProperties addHumanFood(@Nullable FoodProperties dsOriginal, @Local(argsOnly = true) Holder<DragonSpecies> species, @Local(argsOnly = true) FoodProperties original) {
         if (species.is(Dragonborn.CAN_EAT_HUMAN_FOOD))
             return original;
         return dsOriginal;
