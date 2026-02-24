@@ -3,6 +3,7 @@ package hu.zoldleo.dragonborn.mixin;
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateProvider;
 import by.dragonsurvivalteam.dragonsurvival.common.handlers.DragonSizeHandler;
 import by.dragonsurvivalteam.dragonsurvival.compat.Compat;
+import by.dragonsurvivalteam.dragonsurvival.registry.attachments.TreasureRestData;
 import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
@@ -38,5 +39,11 @@ public abstract class PlayerMixin {
     private boolean glide(boolean original) {
         Player player = (Player)(Object)this;
         return original || (DragonbornUtils.isDragonborn(player) && ServerFlightHandler.isGliding(player));
+    }
+
+    @ModifyExpressionValue(method = "updatePlayerPose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSleeping()Z"))
+    private boolean rest(boolean original) {
+        Player player = (Player)(Object)this;
+        return original || TreasureRestData.getData(player).isResting();
     }
 }
