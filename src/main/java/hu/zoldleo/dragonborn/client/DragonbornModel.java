@@ -70,7 +70,6 @@ public class DragonbornModel extends GeoModel<DragonbornEntity> {
         if (player != null) {
             DragonEntity dragon = ClientDragonRenderer.getOrCreateDragon(player);
             applyDSQueries(dragon, player);
-            System.out.println(dragon.currentBodyYawChange);
         }
     }
 

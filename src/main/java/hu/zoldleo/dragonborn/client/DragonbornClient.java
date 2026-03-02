@@ -11,13 +11,15 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod(value = Dragonborn.MODID, dist = Dist.CLIENT)
 public class DragonbornClient {
+    public static DragonbornModel DRAGONBORN_MODEL = new DragonbornModel();
+
     public  DragonbornClient(final IEventBus bus, final ModContainer container) {
         bus.addListener(this::setup);
     }
 
     private void setup(final FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            EntityRenderers.register(DragonbornEntities.DRAGONBORN.get(), manager -> new DragonbornEntityRenderer(manager, new DragonbornModel()));
+            EntityRenderers.register(DragonbornEntities.DRAGONBORN.get(), manager -> new DragonbornEntityRenderer(manager, DRAGONBORN_MODEL));
         });
     }
 }

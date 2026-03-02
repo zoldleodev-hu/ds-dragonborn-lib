@@ -27,8 +27,6 @@ public abstract class DragonSizeHandlerMixin {
     @Inject(method = "getDragonSize", at = @At("HEAD"), cancellable = true)
     private static void dragonbornSize(EntityEvent.Size event, CallbackInfo ci) {
         if (DragonbornUtils.isDragonborn(event.getEntity())) {
-            EntityDimensions dim = event.getEntity().getDimensions(event.getEntity().getPose());
-            event.setNewSize(dim);
             ci.cancel();
         }
     }

@@ -14,6 +14,10 @@ public class DragonbornUtils {
         return handler != null && handler.isDragon() && handler.species().is(Dragonborn.DRAGONBORN_SPECIES);
     }
 
+    public static boolean isDragonborn(Player player) {
+        return isDragonborn(player.getData(DSDataAttachments.DRAGON_HANDLER));
+    }
+
     public static boolean isDragonborn(@Nullable Entity entity) {
         return entity instanceof Player player && isDragonborn(player.getData(DSDataAttachments.DRAGON_HANDLER));
     }
