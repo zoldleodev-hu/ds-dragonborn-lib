@@ -22,10 +22,10 @@ import static by.dragonsurvivalteam.dragonsurvival.client.render.ClientDragonRen
 public class ClientDragonRendererMixin {
     @Inject(method = "renderDragon", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/event/RenderPlayerEvent$Pre;getPartialTick()F"), cancellable = true)
     private static void cancelDragonRender(RenderPlayerEvent.Pre event, CallbackInfo ci, @Local DragonEntity dragon, @Local AbstractClientPlayer player) {
-        if (DragonbornUtils.isDragonborn(player)) {
+        if (DragonbornUtils.isDragonDragonborn(player)) {
             dragon.renderingWasCancelled = true;
             event.setCanceled(false);
-            if (!dragon.isInInventory && (player != Minecraft.getInstance().player || !Minecraft.getInstance().options.getCameraType().isFirstPerson() || !ServerFlightHandler.isGliding(player))) {
+            if (!dragon.isInInventory && player != Minecraft.getInstance().player || !Minecraft.getInstance().options.getCameraType().isFirstPerson() || !ServerFlightHandler.isGliding(player) || ClientDragonRenderer.renderFirstPersonFlight) {
                 setDragonMovementData(player, Minecraft.getInstance().getTimer().getRealtimeDeltaTicks());
             }
             ci.cancel();
@@ -34,7 +34,7 @@ public class ClientDragonRendererMixin {
 
     @Inject(method = "setDragonMovementData", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/MovementData;set(DDDLnet/minecraft/world/phys/Vec3;)V"), cancellable = true)
     private static void correctYawForDragonborn(Player player, float realtimeDeltaTick, CallbackInfo ci, @Local MovementData movement, @Local Vec3 deltaMovement) {
-        if (DragonbornUtils.isDragonborn(player)) {
+        if (DragonbornUtils.isDragonDragonborn(player)) {
             movement.set(player.yBodyRot, player.yHeadRot, player.getViewXRot(realtimeDeltaTick), deltaMovement);
             ci.cancel();
         }

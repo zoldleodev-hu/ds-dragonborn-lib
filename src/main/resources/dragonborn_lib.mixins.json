@@ -31,8 +31,7 @@
     "client.LevelRendererMixin",
     "client.LivingEntityRendererMixin",
     "client.PlayerRendererMixin",
-    "client.SmithingScreenMixin",
-    "client.AnimationStateMixin"
+    "client.SmithingScreenMixin"
   ],
   "injectors": {
     "maxShiftBy": 2

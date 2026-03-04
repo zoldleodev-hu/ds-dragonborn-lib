@@ -4,7 +4,6 @@ import by.dragonsurvivalteam.dragonsurvival.DragonSurvival;
 import by.dragonsurvivalteam.dragonsurvival.registry.dragon.DragonSpecies;
 import by.dragonsurvivalteam.dragonsurvival.registry.dragon.body.DragonBody;
 import hu.zoldleo.dragonborn.registry.DragonbornContainers;
-import hu.zoldleo.dragonborn.registry.DragonbornEntities;
 import net.minecraft.tags.TagKey;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -14,11 +13,9 @@ public class Dragonborn {
     public static final String MODID = "dragonborn_lib";
     public static final TagKey<DragonSpecies> DRAGONBORN_SPECIES = TagKey.create(DragonSpecies.REGISTRY, DragonSurvival.res("dragonborn_species"));
     public static final TagKey<DragonSpecies> CAN_EAT_HUMAN_FOOD = TagKey.create(DragonSpecies.REGISTRY, DragonSurvival.res("can_eat_human_food"));
-    public static final TagKey<DragonBody> DRAGONBORN_BODIES = TagKey.create(DragonBody.REGISTRY, DragonSurvival.res("dragonborn_bodies"));
     public static final TagKey<DragonBody> CAN_USE_CUSTOM_SKIN = TagKey.create(DragonBody.REGISTRY, DragonSurvival.res("can_use_custom_skin"));
 
     public Dragonborn(IEventBus modEventBus) {
-        DragonbornEntities.REGISTRY.register(modEventBus);
         DragonbornContainers.REGISTRY.register(modEventBus);
     }
 }

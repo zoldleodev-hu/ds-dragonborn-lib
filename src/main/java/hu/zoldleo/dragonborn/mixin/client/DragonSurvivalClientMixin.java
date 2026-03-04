@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class DragonSurvivalClientMixin {
     @Inject(method = "preventThirdPersonWhenSuffocating", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/mixins/client/LocalPlayerAccessor;dragonSurvival$suffocatesAt(Lnet/minecraft/core/BlockPos;)Z"), cancellable = true)
     private void excludeDragonborn(ClientTickEvent.Post event, CallbackInfo ci, @Local Player player) {
-        if (DragonbornUtils.isDragonborn(player))
+        if (DragonbornUtils.isDragonDragonborn(player))
             ci.cancel();
     }
 }

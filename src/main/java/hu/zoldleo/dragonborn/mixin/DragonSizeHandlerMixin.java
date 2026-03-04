@@ -2,6 +2,7 @@ package hu.zoldleo.dragonborn.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
 import by.dragonsurvivalteam.dragonsurvival.common.handlers.DragonSizeHandler;
+import com.llamalad7.mixinextras.sugar.Local;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
@@ -24,9 +25,9 @@ public abstract class DragonSizeHandlerMixin {
         }
     }
 
-    @Inject(method = "getDragonSize", at = @At("HEAD"), cancellable = true)
-    private static void dragonbornSize(EntityEvent.Size event, CallbackInfo ci) {
-        if (DragonbornUtils.isDragonborn(event.getEntity())) {
+    @Inject(method = "getDragonSize", at = @At(value = "INVOKE_ASSIGN", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;getData(Lnet/minecraft/world/entity/player/Player;)Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;"), cancellable = true)
+    private static void dragonbornSize(EntityEvent.Size event, CallbackInfo ci, @Local DragonStateHandler handler) {
+        if (DragonbornUtils.isDragonborn(handler)) {
             ci.cancel();
         }
     }
