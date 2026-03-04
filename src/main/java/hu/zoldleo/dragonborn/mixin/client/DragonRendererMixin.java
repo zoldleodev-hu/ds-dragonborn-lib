@@ -64,12 +64,12 @@ public class DragonRendererMixin {
 
     @Unique
     private void dragonborn$copyTRSData(ModelPart root, GeoBone bone) {
-        bone.setPosX(-root.x);
+        bone.setPosX(root.x);
         bone.setPosY(-root.y);
         bone.setPosZ(root.z);
         bone.setRotX(-root.xRot);
         bone.setRotY(-root.yRot);
-        bone.setRotZ(-root.zRot);
+        bone.setRotZ(root.zRot);
         bone.setScaleX(root.xScale);
         bone.setScaleY(root.yScale);
         bone.setScaleZ(root.zScale);
