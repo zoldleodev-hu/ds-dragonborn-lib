@@ -1,3 +1,23 @@
+//  This file is part of Dragonborn lib.
+//  Copyright (C) 2025  ZoldLeo
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License, or (at your option) any later version.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+//  USA
+//
+//  zoldleo.dev@gmail.com
+
 package hu.zoldleo.dragonborn.server;
 
 import hu.zoldleo.dragonborn.registry.DragonbornContainers;
@@ -72,43 +92,43 @@ public class DragonbornContainer extends AbstractContainerMenu {
 
     public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = (Slot)this.slots.get(index);
+        Slot slot = slots.get(index);
         if (slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
             EquipmentSlot equipmentslot = player.getEquipmentSlotForItem(itemstack);
             if (index == 0) {
-                if (!this.moveItemStackTo(itemstack1, 9, 45, true)) {
+                if (!moveItemStackTo(itemstack1, 9, 45, true)) {
                     return ItemStack.EMPTY;
                 }
 
                 slot.onQuickCraft(itemstack1, itemstack);
             } else if (index >= 1 && index < 5) {
-                if (!this.moveItemStackTo(itemstack1, 9, 45, false)) {
+                if (!moveItemStackTo(itemstack1, 9, 45, false)) {
                     return ItemStack.EMPTY;
                 }
             } else if (index >= 5 && index < 9) {
-                if (!this.moveItemStackTo(itemstack1, 9, 45, false)) {
+                if (!moveItemStackTo(itemstack1, 9, 45, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (equipmentslot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !((Slot)this.slots.get(8 - equipmentslot.getIndex())).hasItem()) {
+            } else if (equipmentslot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !slots.get(8 - equipmentslot.getIndex()).hasItem()) {
                 int i = 8 - equipmentslot.getIndex();
-                if (!this.moveItemStackTo(itemstack1, i, i + 1, false)) {
+                if (!moveItemStackTo(itemstack1, i, i + 1, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (equipmentslot == EquipmentSlot.OFFHAND && !((Slot)this.slots.get(45)).hasItem()) {
-                if (!this.moveItemStackTo(itemstack1, 45, 46, false)) {
+            } else if (equipmentslot == EquipmentSlot.OFFHAND && !slots.get(45).hasItem()) {
+                if (!moveItemStackTo(itemstack1, 45, 46, false)) {
                     return ItemStack.EMPTY;
                 }
             } else if (index >= 9 && index < 36) {
-                if (!this.moveItemStackTo(itemstack1, 36, 45, false)) {
+                if (!moveItemStackTo(itemstack1, 36, 45, false)) {
                     return ItemStack.EMPTY;
                 }
             } else if (index >= 36 && index < 45) {
-                if (!this.moveItemStackTo(itemstack1, 9, 36, false)) {
+                if (!moveItemStackTo(itemstack1, 9, 36, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.moveItemStackTo(itemstack1, 9, 45, false)) {
+            } else if (!moveItemStackTo(itemstack1, 9, 45, false)) {
                 return ItemStack.EMPTY;
             }
 
@@ -132,28 +152,28 @@ public class DragonbornContainer extends AbstractContainerMenu {
     }
 
     public boolean canTakeItemForPickAll(@Nonnull ItemStack itemStack, Slot slot) {
-        return slot.container != this.craftResult && super.canTakeItemForPickAll(itemStack, slot);
+        return slot.container != craftResult && super.canTakeItemForPickAll(itemStack, slot);
     }
 
     public void removed(@NotNull Player player) {
         super.removed(player);
-        this.clearContainer(player, this.craftMatrix);
+        clearContainer(player, craftMatrix);
     }
 
     public void slotsChanged(@NotNull Container inventory) {
-        if (this.player instanceof ServerPlayer serverPlayer) {
+        if (player instanceof ServerPlayer serverPlayer) {
             ItemStack itemStack = ItemStack.EMPTY;
-            Optional<RecipeHolder<CraftingRecipe>> recipeOptional = serverPlayer.serverLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, this.craftMatrix.asCraftInput(), serverPlayer.level());
+            Optional<RecipeHolder<CraftingRecipe>> recipeOptional = serverPlayer.serverLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), serverPlayer.level());
             if (recipeOptional.isPresent()) {
                 RecipeHolder<CraftingRecipe> recipe = recipeOptional.get();
-                if (this.craftResult.setRecipeUsed(this.player.level(), serverPlayer, recipe)) {
-                    itemStack = (recipe.value()).assemble(this.craftMatrix.asCraftInput(), serverPlayer.level().registryAccess());
+                if (craftResult.setRecipeUsed(player.level(), serverPlayer, recipe)) {
+                    itemStack = (recipe.value()).assemble(craftMatrix.asCraftInput(), serverPlayer.level().registryAccess());
                 }
             }
 
-            this.craftResult.setItem(45, itemStack);
-            this.setRemoteSlot(45, itemStack);
-            serverPlayer.connection.send(new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), 45, itemStack));
+            craftResult.setItem(45, itemStack);
+            setRemoteSlot(45, itemStack);
+            serverPlayer.connection.send(new ClientboundContainerSetSlotPacket(containerId, incrementStateId(), 45, itemStack));
         }
 
     }
