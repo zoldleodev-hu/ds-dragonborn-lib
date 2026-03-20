@@ -92,5 +92,12 @@ file="META-INF/accesstransformer.cfg"
 #[features.${mod_id}]
 #openGLVersion="[3.2,)"
 
+[[dependencies.dragonborn_lib]]
+modId="dragonsurvival"
+type="required"
+versionRange="[2.0.53,)"
+ordering="AFTER"
+side="BOTH"
+
 [[mixins]]
 config = "${mod_id}.mixins.json"
