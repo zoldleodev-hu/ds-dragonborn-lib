@@ -54,7 +54,7 @@ public abstract class DragonSizeHandlerMixin {
     @Inject(method = "calculateDimensions", at = @At("HEAD"), cancellable = true)
     private static void injectPlayerDim(DragonStateHandler handler, Player player, Pose overridePose, CallbackInfoReturnable<EntityDimensions> cir) {
         if (DragonbornUtils.isDragonborn(player)) {
-            cir.setReturnValue(player.getDimensions(overridePose));
+            cir.setReturnValue(player.getDimensions(player.getPose()));
         }
     }
 }

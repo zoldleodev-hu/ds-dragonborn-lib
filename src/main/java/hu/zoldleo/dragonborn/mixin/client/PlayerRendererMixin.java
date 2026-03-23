@@ -58,6 +58,8 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
                 if (DragonbornUtils.isDragonborn(handler) && !player.isInvisible()) {
                     poseStack.pushPose();
                     poseStack.mulPose(Axis.XP.rotationDegrees(180f));
+                    float scale = 1f / player.getScale();
+                    poseStack.scale(scale, scale, scale);
                     Minecraft.getInstance().getEntityRenderDispatcher().render(ClientDragonRenderer.getOrCreateDragon(player), 0, 0, 0, 0, partialTicks, poseStack, buffer, packedLight);
                     poseStack.popPose();
                 }
