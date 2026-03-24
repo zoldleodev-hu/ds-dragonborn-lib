@@ -28,6 +28,7 @@ repositories {
             includeGroup("software.bernie.geckolib")
         }
     }
+    maven { url = "https://maven.bawnorton.com/releases" }
     // Add here additional repositories if required by some of the dependencies below.
 }
 
@@ -122,9 +123,11 @@ configurations {
 }
 
 dependencies {
-    implementation "net.neoforged:neoforge:${neo_version}"
+    //implementation "net.neoforged:neoforge:${neo_version}"
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     implementation "dragonsurvival:DragonSurvival-1.21.1-v2.0.53-05.01.2026-all"
+    compileOnly(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.7-beta.1"))
+    implementation(jarJar("com.github.bawnorton.mixinsquared:mixinsquared-neoforge:0.3.7-beta.1"))
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"

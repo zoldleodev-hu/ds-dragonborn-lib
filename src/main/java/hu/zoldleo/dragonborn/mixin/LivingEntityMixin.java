@@ -29,10 +29,16 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
-public class LivingEntityMixin {
+public abstract class LivingEntityMixin {
+    @Shadow
+    protected abstract boolean isImmobile();
+
     @ModifyReturnValue(method = "isFallFlying", at = @At("RETURN"))
     private boolean spinOrGlide(boolean original) {
         LivingEntity entity = (LivingEntity) (Object) this;
@@ -41,5 +47,14 @@ public class LivingEntityMixin {
         Vec3 vec32 = vec3.add(vec31.x * 0.01, vec31.y * 0.01, vec31.z * 0.01);
         BlockHitResult hit = entity.level().clip(new ClipContext(vec3, vec32, ClipContext.Block.OUTLINE, net.minecraft.world.level.ClipContext.Fluid.NONE, entity));
         return original || (entity instanceof Player player && DragonbornUtils.isDragonborn(player) && (ServerFlightHandler.isSpin(player) || (ServerFlightHandler.isGliding(player) && !hit.isInside())));
+    }
+
+    @Inject(
+            method = {"aiStep"},
+            at = {@At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isImmobile()Z")}
+    )
+    private void dragonSurvival$preventMovement(CallbackInfo ci) {
+        if ((Object)this instanceof Player player && isImmobile())
+            player.yHeadRot = player.getYRot();
     }
 }

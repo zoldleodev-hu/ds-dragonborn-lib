@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "mixins": [
+    "DragonEntityMixin",
     "DragonFoodHandlerMixin",
     "DragonRidingHandlerMixin",
     "DragonSizeHandlerMixin",
@@ -14,7 +15,8 @@
     "LivingEntityMixin",
     "PlayerMixin",
     "RequestOpenDragonInventoryMixin",
-    "SortingHandlerMixin"
+    "SortingHandlerMixin",
+    "client.DragonGlowLayerRendererMixin"
   ],
   "client": [
     "client.ClientDragonRendererMixin",
