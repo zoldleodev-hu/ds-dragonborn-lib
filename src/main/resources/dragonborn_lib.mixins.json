@@ -13,10 +13,11 @@
     "DragonStateHandlerMixin",
     "EntityMixin",
     "LivingEntityMixin",
+    "PlayerAccessor",
     "PlayerMixin",
     "RequestOpenDragonInventoryMixin",
-    "SortingHandlerMixin",
-    "client.DragonGlowLayerRendererMixin"
+    "ServerFlightHandlerMixin",
+    "SortingHandlerMixin"
   ],
   "client": [
     "client.ClientDragonRendererMixin",
@@ -24,6 +25,7 @@
     "client.DragonAltarScreenMixin",
     "client.DragonEditorHandlerMixin",
     "client.DragonEditorScreenMixin",
+    "client.DragonGlowLayerRendererMixin",
     "client.DragonModelMixin",
     "client.DragonRendererMixin",
     "client.DragonSoulRendererMixin",

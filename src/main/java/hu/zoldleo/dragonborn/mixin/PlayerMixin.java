@@ -66,4 +66,7 @@ public abstract class PlayerMixin {
         Player player = (Player)(Object)this;
         return original || TreasureRestData.getData(player).isResting();
     }
+
+    @Unique
+    public boolean dragonborn$landed;
 }
