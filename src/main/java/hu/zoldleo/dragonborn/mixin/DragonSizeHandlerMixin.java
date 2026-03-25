@@ -24,6 +24,7 @@ import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler
 import by.dragonsurvivalteam.dragonsurvival.common.handlers.DragonSizeHandler;
 import com.llamalad7.mixinextras.sugar.Local;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
@@ -56,5 +57,11 @@ public abstract class DragonSizeHandlerMixin {
         if (DragonbornUtils.isDragonborn(player)) {
             cir.setReturnValue(player.getDimensions(player.getPose()));
         }
+    }
+
+    @Inject(method = "fudgePositionAfterSizeChange", at = @At("HEAD"), cancellable = true)
+    private static void excludePassengerDragonborn(Entity entity, EntityDimensions currentDimension, EntityDimensions newDimensions, CallbackInfo ci) {
+        if (DragonbornUtils.isDragonborn(entity) && entity.isPassenger())
+            ci.cancel();
     }
 }
