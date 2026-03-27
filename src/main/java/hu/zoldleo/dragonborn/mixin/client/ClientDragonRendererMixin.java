@@ -41,7 +41,7 @@ import static by.dragonsurvivalteam.dragonsurvival.client.render.ClientDragonRen
 @Mixin(ClientDragonRenderer.class)
 public class ClientDragonRendererMixin {
     @Inject(method = "renderDragon", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/event/RenderPlayerEvent$Pre;getPartialTick()F"), cancellable = true)
-    private static void cancelDragonRender(RenderPlayerEvent.Pre event, CallbackInfo ci, @Local DragonEntity dragon, @Local AbstractClientPlayer player) {
+    private static void cancelDragonRender(RenderPlayerEvent.Pre event, CallbackInfo ci, @Local(name = "dragon") DragonEntity dragon, @Local(name = "player") AbstractClientPlayer player) {
         if (DragonbornUtils.isDragonDragonborn(player)) {
             dragon.renderingWasCancelled = true;
             event.setCanceled(false);
@@ -53,7 +53,7 @@ public class ClientDragonRendererMixin {
     }
 
     @Inject(method = "setDragonMovementData", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/MovementData;set(DDDLnet/minecraft/world/phys/Vec3;)V"), cancellable = true)
-    private static void correctYawForDragonborn(Player player, float realtimeDeltaTick, CallbackInfo ci, @Local MovementData movement, @Local Vec3 deltaMovement) {
+    private static void correctYawForDragonborn(Player player, float realtimeDeltaTick, CallbackInfo ci, @Local(name = "movement") MovementData movement, @Local(name = "moveVector") Vec3 deltaMovement) {
         if (DragonbornUtils.isDragonDragonborn(player)) {
             movement.set(player.yBodyRot, player.yHeadRot, player.getViewXRot(realtimeDeltaTick), deltaMovement);
             ci.cancel();

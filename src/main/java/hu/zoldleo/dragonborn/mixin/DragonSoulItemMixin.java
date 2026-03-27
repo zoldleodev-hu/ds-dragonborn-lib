@@ -39,14 +39,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(DragonSoulItem.class)
 public class DragonSoulItemMixin {
     @Inject(method = "finishUsingItem", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/PenaltySupply;clear(Lnet/minecraft/world/entity/player/Player;)V"))
-    private void reinsertItemsFixAndStoreProfile(ItemStack stack, Level level, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir, @Local Player player, @Local DragonStateHandler handler) {
+    private void reinsertItemsFixAndStoreProfile(ItemStack stack, Level level, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir, @Local(name = "player") Player player, @Local(name = "handler") DragonStateHandler handler) {
         if (DragonbornUtils.isDragonDragonborn(handler))
             ClawInventoryData.reInsertClawTools(player);
         stack.set(DataComponents.PROFILE, new ResolvableProfile(player.getGameProfile()));
     }
 
     @Inject(method = "finishUsingItem", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;revertToHumanForm(Lnet/minecraft/world/entity/player/Player;Z)V"))
-    private void storeProfile(ItemStack stack, Level level, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir, @Local Player player) {
+    private void storeProfile(ItemStack stack, Level level, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir, @Local(name = "player") Player player) {
         stack.set(DataComponents.PROFILE, new ResolvableProfile(player.getGameProfile()));
     }
 

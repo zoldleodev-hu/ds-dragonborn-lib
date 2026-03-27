@@ -50,7 +50,7 @@ import java.util.Optional;
 @Mixin(DragonRenderer.class)
 public class DragonRendererMixin {
     @Inject(method = "getModelOffset", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/MovementData;getData(Lnet/minecraft/world/entity/Entity;)Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/MovementData;"), cancellable = true)
-    private void noOffset(DragonEntity dragon, float partialTicks, CallbackInfoReturnable<Vec3> cir, @Local Player player) {
+    private void noOffset(DragonEntity dragon, float partialTicks, CallbackInfoReturnable<Vec3> cir, @Local(name = "player") Player player) {
         DragonStateHandler handler = player.getData(DSDataAttachments.DRAGON_HANDLER);
         if (player instanceof FakeClientPlayer fake)
             handler = fake.handler;
@@ -60,7 +60,7 @@ public class DragonRendererMixin {
     }
 
     @Inject(method = "preRender(Lcom/mojang/blaze3d/vertex/PoseStack;Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;Lsoftware/bernie/geckolib/cache/object/BakedGeoModel;Lnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZFIII)V", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/Optional;orElse(Ljava/lang/Object;)Ljava/lang/Object;"))
-    private void dragonbornAttachmentPoints(PoseStack poseStack, DragonEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int color, CallbackInfo ci, @Local Player player) {
+    private void dragonbornAttachmentPoints(PoseStack poseStack, DragonEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int color, CallbackInfo ci, @Local(name = "player") Player player) {
         if (player instanceof AbstractClientPlayer abstractPlayer && DragonbornUtils.isDragonborn(player)) {
             Optional<GeoBone> headBone = model.getBone("Head");
             Optional<GeoBone> bodyBone = model.getBone("Body");

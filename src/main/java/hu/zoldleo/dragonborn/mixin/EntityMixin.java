@@ -20,52 +20,37 @@
 
 package hu.zoldleo.dragonborn.mixin;
 
-import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
-import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
+import com.bawnorton.mixinsquared.TargetHandler;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Entity.class)
+@Mixin(value = Entity.class, priority = 1500)
 public abstract class EntityMixin {
-    @Unique
-    DragonStateHandler dragonborn$tempHandler = null;
-
-    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At("HEAD"))
-    private void removeDragon(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
-        if ((Object) this instanceof Player player) {
-            dragonborn$tempHandler = player.getData(DSDataAttachments.DRAGON_HANDLER);
-            if (DragonbornUtils.isDragonborn(dragonborn$tempHandler))
-                player.setData(DSDataAttachments.DRAGON_HANDLER, DragonbornUtils.emptyHandler);
-        }
+    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.EntityMixin", name = "dragonSurvival$canRide")
+    @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z", ordinal = 0))
+    private boolean excludeDragonborn(Entity player, Operation<Boolean> original) {
+        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
     }
 
-    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At("RETURN"))
-    private void restoreDragon(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
-        if ((Object) this instanceof Player player) {
-            player.setData(DSDataAttachments.DRAGON_HANDLER, dragonborn$tempHandler);
-        }
+    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.EntityMixin", name = "dragonSurvival$modifyPassengerRidingPosition")
+    @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z", ordinal = 0))
+    private boolean dragonbornNoOffset1(Entity player, Operation<Boolean> original) {
+        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
     }
 
-    @Inject(method = "positionRider(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity$MoveFunction;)V", at = @At("HEAD"))
-    private void removeDragonForPos(Entity passenger, Entity.MoveFunction callback, CallbackInfo ci) {
-        if (passenger instanceof Player player) {
-            dragonborn$tempHandler = player.getData(DSDataAttachments.DRAGON_HANDLER);
-            if (DragonbornUtils.isDragonborn(dragonborn$tempHandler))
-                player.setData(DSDataAttachments.DRAGON_HANDLER, DragonbornUtils.emptyHandler);
-        }
+    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.EntityMixin", name = "dragonSurvival$modifyPassengerAttachmentPoint")
+    @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z", ordinal = 1))
+    private boolean dragonbornNoOffset2(Entity player, Operation<Boolean> original) {
+        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
     }
 
-    @Inject(method = "positionRider(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity$MoveFunction;)V", at = @At("TAIL"))
-    private void restoreDragonForPos(Entity passenger, Entity.MoveFunction callback, CallbackInfo ci) {
-        if (passenger instanceof Player player) {
-            player.setData(DSDataAttachments.DRAGON_HANDLER, dragonborn$tempHandler);
-        }
+    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.EntityMixin", name = "dragonSurvival$modifyPassengerAttachmentPoint")
+    @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z", ordinal = 2))
+    private boolean dragonbornNoOffset3(Entity player, Operation<Boolean> original) {
+        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
     }
 }

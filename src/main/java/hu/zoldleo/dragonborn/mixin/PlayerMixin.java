@@ -20,33 +20,26 @@
 
 package hu.zoldleo.dragonborn.mixin;
 
-import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateProvider;
-import by.dragonsurvivalteam.dragonsurvival.common.handlers.DragonSizeHandler;
-import by.dragonsurvivalteam.dragonsurvival.compat.Compat;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.TreasureRestData;
 import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
+import com.bawnorton.mixinsquared.TargetHandler;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
-import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(Player.class)
+@Mixin(value = Player.class, priority = 1500)
 public abstract class PlayerMixin {
-    @Redirect(method = "updatePlayerPose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;canPlayerFitWithinBlocksAndEntitiesWhen(Lnet/minecraft/world/entity/Pose;)Z"))
-    private boolean desperateTweak(Player instance, Pose pose) {
-        return dragonborn$tweakedFitCheck(pose);
-    }
-
-    @Unique
-    private boolean dragonborn$tweakedFitCheck(Pose pose) {
-        Player player = (Player)(Object)this;
-        return (DragonStateProvider.isDragon(player) && !DragonbornUtils.isDragonDragonborn(player) && !Compat.hasModelSwap(player)) ?
-                DragonSizeHandler.canPoseFit(player, pose) :
-                player.level().noCollision(player, player.getDimensions(pose).makeBoundingBox(player.position()).deflate(1.0E-7));
+    // Might be unused
+    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.PlayerMixin", name = "dragonSurvival$checkDragonHitbox")
+    @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean excludeDragonborn(Entity player, Operation<Boolean> original) {
+        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
     }
 
     @ModifyExpressionValue(method = "updatePlayerPose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isAutoSpinAttack()Z"))

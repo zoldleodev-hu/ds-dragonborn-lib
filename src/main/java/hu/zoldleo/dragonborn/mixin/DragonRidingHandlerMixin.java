@@ -30,15 +30,15 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(DragonRidingHandler.class)
 public abstract class DragonRidingHandlerMixin {
-    @ModifyVariable(method = "playerCanRideDragon", at = @At("STORE"))
-    private static boolean dragonIsTooSmallToRide(boolean original, @Local(ordinal = 0, argsOnly = true) Player rider, @Local double scaleRatio) {
+    @ModifyVariable(method = "playerCanRideDragon", at = @At("STORE"), name = "dragonIsTooSmallToRide")
+    private static boolean dragonIsTooSmallToRide(boolean original, @Local(ordinal = 0, argsOnly = true) Player rider, @Local(name = "scaleRatio") double scaleRatio) {
         if (DragonbornUtils.isDragonborn(rider))
             return scaleRatio >= 0.8;
         return original;
     }
 
-    @ModifyVariable(method = "onRideAttempt", at = @At("STORE"))
-    private static float ridingScaleRatio(float original, @Local Player self) {
+    @ModifyVariable(method = "onRideAttempt", at = @At("STORE"), name = "ridingScaleRatio")
+    private static float ridingScaleRatio(float original, @Local(name = "self") Player self) {
         if (DragonbornUtils.isDragonborn(self))
             return 0.8f;
         return original;

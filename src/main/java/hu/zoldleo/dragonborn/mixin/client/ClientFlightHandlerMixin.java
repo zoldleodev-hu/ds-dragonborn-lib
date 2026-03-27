@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientFlightHandler.class)
 public class ClientFlightHandlerMixin {
     @Inject(method = "triggerSpin", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/neoforged/neoforge/network/PacketDistributor;sendToServer(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;[Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;)V"))
-    private static void spinPlayer(@Nullable Pair<Player, DragonStateHandler> data, CallbackInfo ci, @Local Player player, @Local FlightData spin) {
+    private static void spinPlayer(@Nullable Pair<Player, DragonStateHandler> data, CallbackInfo ci, @Local(name = "player") Player player, @Local(name = "spin") FlightData spin) {
         player.startAutoSpinAttack(spin.duration, 0, ItemStack.EMPTY);
     }
 }

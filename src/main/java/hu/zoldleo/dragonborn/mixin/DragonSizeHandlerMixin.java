@@ -46,7 +46,7 @@ public abstract class DragonSizeHandlerMixin {
     }
 
     @Inject(method = "getDragonSize", at = @At(value = "INVOKE_ASSIGN", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;getData(Lnet/minecraft/world/entity/player/Player;)Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;"), cancellable = true)
-    private static void dragonbornSize(EntityEvent.Size event, CallbackInfo ci, @Local DragonStateHandler handler) {
+    private static void dragonbornSize(EntityEvent.Size event, CallbackInfo ci, @Local(name = "handler") DragonStateHandler handler) {
         if (DragonbornUtils.isDragonborn(handler)) {
             ci.cancel();
         }

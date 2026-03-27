@@ -34,7 +34,10 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import hu.zoldleo.dragonborn.mixin.DragonStateHandlerAccessor;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;
@@ -54,6 +57,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.IOException;
 
+@SuppressWarnings("all")
 @Mixin(DragonEditorHandler.class)
 public class DragonEditorHandlerMixin {
     @Shadow
@@ -62,7 +66,7 @@ public class DragonEditorHandlerMixin {
     private static ShaderInstance dragonborn$skinGenerationMaskShader;
 
     @Inject(method = "generateSkinTextures", at = @At(value = "INVOKE_ASSIGN", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;getCurrentStageCustomization()Lby/dragonsurvivalteam/dragonsurvival/client/skin_editor_system/objects/DragonStageCustomization;"))
-    private static void addPlayerTexture(DragonEntity dragon, CallbackInfo ci, @Local(ordinal = 0) RenderTarget normalTarget, @Local(ordinal = 1) int viewportX, @Local(ordinal = 2) int viewportY, @Local(ordinal = 3) int viewportW, @Local(ordinal = 4) int viewportH) {
+    private static void addPlayerTexture(DragonEntity dragon, CallbackInfo ci, @Local(name = "normalTarget") RenderTarget normalTarget, @Local(name = "currentViewportX") int viewportX, @Local(name = "currentViewportY") int viewportY, @Local(name = "currentViewportWidth") int viewportW, @Local(name = "currentViewportHeight") int viewportH) {
         if (dragon.getPlayer() instanceof AbstractClientPlayer player) {
             DragonStateHandler handler = player.getData(DSDataAttachments.DRAGON_HANDLER);
             if (dragon.getPlayer() instanceof FakeClientPlayer fake) {
@@ -107,7 +111,7 @@ public class DragonEditorHandlerMixin {
     }
 
     @Inject(method = "generateSkinTextures", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;renderThreadTesselator()Lcom/mojang/blaze3d/vertex/Tesselator;", ordinal = 0))
-    private static void applyMask(DragonEntity dragon, CallbackInfo ci, @Local AbstractTexture texture, @Local(ordinal = 0) float hueVal, @Local(ordinal = 1) float satVal, @Local(ordinal = 2) float brightVal, @Local(ordinal = 0) DragonPart skinTexture, @Local LayerSettings settings, @Local SkinLayer layer, @Local DragonStateHandler handler) {
+    private static void applyMask(DragonEntity dragon, CallbackInfo ci, @Local(name = "texture") AbstractTexture texture, @Local(name = "hueVal") float hueVal, @Local(name = "satVal") float satVal, @Local(name = "brightVal") float brightVal, @Local(name = "skinTexture") DragonPart skinTexture, @Local(name = "settings") LayerSettings settings, @Local(name = "layer") SkinLayer layer, @Local(name = "handler") DragonStateHandler handler) {
         ResourceLocation maskLocation = DragonSurvival.res("textures/dragon/custom/masks/" + handler.body().value().model().getPath() + '/' + layer.getNameLowerCase() + "_mask.png");
         if (Minecraft.getInstance().getResourceManager().getResource(maskLocation).isEmpty())
             return;
