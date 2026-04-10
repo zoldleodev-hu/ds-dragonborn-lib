@@ -34,6 +34,7 @@
     "client.ItemInHandRendererMixin",
     "client.LevelRendererMixin",
     "client.LivingEntityRendererMixin",
+    "client.MagicHUDMixin",
     "client.PlayerRendererMixin",
     "client.SmithingScreenMixin"
   ],
