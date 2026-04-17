@@ -32,6 +32,8 @@ import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = Player.class, priority = 1500)
 public abstract class PlayerMixin {
@@ -60,6 +62,18 @@ public abstract class PlayerMixin {
         return original || TreasureRestData.getData(player).isResting();
     }
 
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void setBedOrientation(CallbackInfo ci) {
+        Player player = (Player)(Object)this;
+        if (DragonbornUtils.isDragonborn(player) && !TreasureRestData.getData(player).isResting())
+            dragonborn$sleepDir = player.yHeadRot;
+    }
+
     @Unique
+    @SuppressWarnings("unused")
     public boolean dragonborn$landed;
+
+    @Unique
+    @SuppressWarnings("all")
+    private float dragonborn$sleepDir;
 }

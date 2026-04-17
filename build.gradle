@@ -63,7 +63,7 @@ neoForge {
 
         server {
             server()
-            programArgument '--nogui'
+            //programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
@@ -201,4 +201,16 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
+}
+
+tasks.register("noArt", Jar) {
+    from sourceSets.main.output
+    exclude "assets/dragonsurvival/animations"
+    exclude "assets/dragonsurvival/geo/dragonborn*"
+    from jarJar
+    archiveVersion = "$mod_version-noArt"
+}
+
+artifacts {
+    archives(noArt)
 }
