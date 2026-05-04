@@ -21,12 +21,29 @@
 package hu.zoldleo.dragonborn.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
+import by.dragonsurvivalteam.dragonsurvival.registry.attachments.ClawInventoryData;
+import by.dragonsurvivalteam.dragonsurvival.registry.dragon.DragonSpecies;
+import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.core.Holder;
+import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DragonStateHandler.class)
 public class DragonStateHandlerMixin {
     @Unique
+    @SuppressWarnings("unused")
     public PlayerSkin dragonborn$fakeSkin;
+
+    @SuppressWarnings("all")
+    @Inject(method = "setSpecies(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/Holder;Z)V", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/PenaltySupply;clear(Lnet/minecraft/world/entity/player/Player;)V", ordinal = 0))
+    private void reinsertClawToolsForDragonborn(@Nullable Player player, @Nullable Holder<DragonSpecies> species, boolean savedForSoul, CallbackInfo ci) {
+        if (DragonbornUtils.isSpeciesDragonborn(species))
+            ClawInventoryData.reInsertClawTools(player);
+    }
 }

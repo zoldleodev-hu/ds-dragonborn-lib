@@ -17,7 +17,8 @@
     "PlayerMixin",
     "RequestOpenDragonInventoryMixin",
     "ServerFlightHandlerMixin",
-    "SortingHandlerMixin"
+    "SortingHandlerMixin",
+    "SyncCompleteMixin"
   ],
   "client": [
     "client.ClientDragonRendererMixin",

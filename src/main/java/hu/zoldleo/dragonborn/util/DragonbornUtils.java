@@ -22,12 +22,15 @@ package hu.zoldleo.dragonborn.util;
 
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
+import by.dragonsurvivalteam.dragonsurvival.registry.dragon.DragonSpecies;
 import hu.zoldleo.dragonborn.Dragonborn;
+import net.minecraft.core.Holder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class DragonbornUtils {
+    @SuppressWarnings("unused")
     public static final DragonStateHandler emptyHandler = new DragonStateHandler();
 
     public static boolean isDragonborn(DragonStateHandler handler) {
@@ -46,10 +49,15 @@ public class DragonbornUtils {
         return handler.species().is(Dragonborn.DRAGONBORN_SPECIES);
     }
 
+    public static boolean isSpeciesDragonborn(Holder<DragonSpecies> species) {
+        return species.is(Dragonborn.DRAGONBORN_SPECIES);
+    }
+
     public static boolean isDragonDragonborn(Player player) {
         return isDragonDragonborn(player.getData(DSDataAttachments.DRAGON_HANDLER));
     }
 
+    @SuppressWarnings("all")
     public static boolean isDragonDragonborn(@Nullable Entity entity) {
         return entity instanceof Player player && isDragonDragonborn(player.getData(DSDataAttachments.DRAGON_HANDLER));
     }
