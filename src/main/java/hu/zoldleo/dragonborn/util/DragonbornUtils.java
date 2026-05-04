@@ -30,9 +30,6 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class DragonbornUtils {
-    @SuppressWarnings("unused")
-    public static final DragonStateHandler emptyHandler = new DragonStateHandler();
-
     public static boolean isDragonborn(DragonStateHandler handler) {
         return handler.isDragon() && handler.species().is(Dragonborn.DRAGONBORN_SPECIES);
     }
