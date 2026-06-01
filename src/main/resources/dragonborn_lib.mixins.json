@@ -21,6 +21,7 @@
     "SyncCompleteMixin"
   ],
   "client": [
+    "bettercombat.HumanoidArmorLayerMixin",
     "client.ClientDragonRendererMixin",
     "client.ClientFlightHandlerMixin",
     "client.DragonAltarScreenMixin",

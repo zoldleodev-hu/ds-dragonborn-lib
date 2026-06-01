@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public class LevelRendererMixin {
     @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.client.LevelRendererMixin", name = "render")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean dontRenderDragonbornInFirstPerson(Entity player, Operation<Boolean> original) {
-        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
+    private boolean dontRenderDragonbornInFirstPerson(Entity entity, Operation<Boolean> original) {
+        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
     }
 }

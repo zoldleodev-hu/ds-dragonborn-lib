@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public class SmithingScreenMixin {
     @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.client.SmithingScreenMixin", name = "dragonSurvival$addDragonToInit")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean excludeDragonborn(Entity player, Operation<Boolean> original) {
-        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
+    private boolean excludeDragonborn(Entity entity, Operation<Boolean> original) {
+        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
     }
 }

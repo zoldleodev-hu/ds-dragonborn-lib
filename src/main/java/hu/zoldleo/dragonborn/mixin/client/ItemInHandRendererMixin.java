@@ -33,13 +33,13 @@ import org.spongepowered.asm.mixin.injection.At;
 public class ItemInHandRendererMixin {
     @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.client.ItemInHandRendererMixin", name = "dragonSurvival$skipRender")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean renderArm(Entity player, Operation<Boolean> original) {
-        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
+    private boolean renderArm(Entity entity, Operation<Boolean> original) {
+        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
     }
 
     @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.client.ItemInHandRendererMixin", name = "dragonSurvival$skipRenderWhenHoldingMaps")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean renderArmWhenHoldingMaps(Entity player, Operation<Boolean> original) {
-        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
+    private boolean renderArmWhenHoldingMaps(Entity entity, Operation<Boolean> original) {
+        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
     }
 }
