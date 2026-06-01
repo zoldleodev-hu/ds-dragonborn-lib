@@ -20,7 +20,7 @@
 
 package hu.zoldleo.dragonborn.mixin.client;
 
-import com.bawnorton.mixinsquared.TargetHandler;
+/*/import com.bawnorton.mixinsquared.TargetHandler;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
@@ -29,11 +29,11 @@ import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(value = LevelRenderer.class, priority = 1500)
+@Mixin(value = LevelRenderer.class, priority = 1500)*/
 public class LevelRendererMixin {
-    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.client.LevelRendererMixin", name = "render")
+    /*/@TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.client.LevelRendererMixin", name = "render")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean dontRenderDragonbornInFirstPerson(Entity player, Operation<Boolean> original) {
         return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
-    }
+    }*/
 }

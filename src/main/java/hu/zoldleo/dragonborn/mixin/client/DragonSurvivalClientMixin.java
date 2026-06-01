@@ -20,7 +20,7 @@
 
 package hu.zoldleo.dragonborn.mixin.client;
 
-import by.dragonsurvivalteam.dragonsurvival.client.DragonSurvivalClient;
+/*/import by.dragonsurvivalteam.dragonsurvival.client.DragonSurvivalClient;
 import com.llamalad7.mixinextras.sugar.Local;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.world.entity.player.Player;
@@ -30,11 +30,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(DragonSurvivalClient.class)
+@Mixin(DragonSurvivalClient.class)*/
 public class DragonSurvivalClientMixin {
-    @Inject(method = "preventThirdPersonWhenSuffocating", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/mixins/client/LocalPlayerAccessor;dragonSurvival$suffocatesAt(Lnet/minecraft/core/BlockPos;)Z"), cancellable = true)
+    /*/@Inject(method = "preventThirdPersonWhenSuffocating", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/mixins/client/LocalPlayerAccessor;dragonSurvival$suffocatesAt(Lnet/minecraft/core/BlockPos;)Z"), cancellable = true)
     private void excludeDragonborn(ClientTickEvent.Post event, CallbackInfo ci, @Local(name = "player") Player player) {
         if (DragonbornUtils.isDragonDragonborn(player))
             ci.cancel();
-    }
+    }*/
 }

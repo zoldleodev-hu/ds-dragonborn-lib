@@ -20,50 +20,56 @@
 
 package hu.zoldleo.dragonborn.mixin.client;
 
-import by.dragonsurvivalteam.dragonsurvival.client.gui.screens.dragon_editor.DragonEditorScreen;
+import by.dragonsurvivalteam.dragonsurvival.client.gui.dragon_editor.DragonEditorScreen;
 import by.dragonsurvivalteam.dragonsurvival.client.models.DragonModel;
 import by.dragonsurvivalteam.dragonsurvival.client.util.FakeClientPlayer;
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
 import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
-import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import hu.zoldleo.dragonborn.Dragonborn;
 import hu.zoldleo.dragonborn.mixin.DragonStateHandlerAccessor;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.Slice;
 
-@Mixin(DragonModel.class)
+@Mixin(value = DragonModel.class, remap = false)
 public abstract class DragonModelMixin {
-    @ModifyExpressionValue(method = "getModelResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;getModel()Lnet/minecraft/resources/ResourceLocation;"))
-    private ResourceLocation getDragonbornModel(ResourceLocation original, @Local(argsOnly = true) DragonEntity dragon) {
+    @ModifyReturnValue(method = "getModelResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", at = @At("RETURN"))
+    private ResourceLocation getDragonbornModel(ResourceLocation original, @Local(argsOnly = true) DragonEntity dragon) throws NoSuchFieldException, IllegalAccessException {
         if (dragon.getPlayer() instanceof AbstractClientPlayer player) {
             if (player instanceof FakeClientPlayer fake && DragonbornUtils.isDragonborn(fake.handler)) {
-                if (fake.handler == DragonEditorScreen.HANDLER && Minecraft.getInstance().player instanceof LocalPlayer local)
-                    player = local;
-                PlayerSkin fakeSkin = ((DragonStateHandlerAccessor)fake.handler).dragonborn$getFakeSkin();
-                PlayerSkin skin = (fakeSkin == null) ? player.getSkin() : fakeSkin;
-                if (skin.model() == PlayerSkin.Model.SLIM)
-                    return fake.handler.getModel().withSuffix("_slim");
-                return fake.handler.getModel().withSuffix("_wide");
+                if (fake.handler == DragonEditorScreen.handler && Minecraft.getInstance().player != null)
+                    player = Minecraft.getInstance().player;
+
+                String fakeSkin = (String)fake.handler.getClass().getField("dragonborn$fakeSkinModelName").get(fake.handler);
+                String skin = (fakeSkin == null) ? player.getModelName() : fakeSkin;
+                ResourceLocation fakeSkinTexture = (ResourceLocation)fake.handler.getClass().getField("dragonborn$fakeSkinTexture").get(fake.handler);
+                if (skin.equals("slim"))
+                    return fakeSkinTexture.withSuffix("_slim");
+                return fakeSkinTexture.withSuffix("_wide");
             }
-            else {
-                DragonStateHandler handler = player.getData(DSDataAttachments.DRAGON_HANDLER);
-                if (DragonbornUtils.isDragonborn(handler))
-                    return original.withSuffix("_extras");
+            else if (DragonbornUtils.isDragonborn(player)) {
+                return original.withSuffix("_extras");
             }
         }
         return original;
     }
 
-    @ModifyExpressionValue(method = "getTextureResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/ResourceLocation;equals(Ljava/lang/Object;)Z"))
-    private boolean useCustomSkin(boolean original, @Local(name = "handler") DragonStateHandler handler) {
-        return original || handler.body().is(Dragonborn.CAN_USE_CUSTOM_SKIN);
+    @ModifyExpressionValue(method = "getTextureResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;getTypeNameLowerCase()Ljava/lang/String;"))
+    private String getCustomTypeName(String original) {
+        return new ResourceLocation(original).getPath();
+    }
+
+    @ModifyConstant(method = "getTextureResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", constant = @Constant(stringValue = "dragonsurvival"), slice = @Slice(from = @At("HEAD"), to = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;getSkinData()Lby/dragonsurvivalteam/dragonsurvival/common/capability/subcapabilities/SkinCap;", ordinal = 3)))
+    private String setCustomTypeNamespace(String constant, @Local(name = "handler") DragonStateHandler handler) {
+        ResourceLocation loc = new ResourceLocation(handler.getTypeNameLowerCase());
+        return loc.getNamespace().equals("minecraft") ? "dragonsurvival" : loc.getNamespace();
     }
 }

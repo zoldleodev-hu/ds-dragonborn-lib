@@ -20,22 +20,27 @@
 
 package hu.zoldleo.dragonborn;
 
-import by.dragonsurvivalteam.dragonsurvival.DragonSurvival;
-import by.dragonsurvivalteam.dragonsurvival.registry.dragon.DragonSpecies;
-import by.dragonsurvivalteam.dragonsurvival.registry.dragon.body.DragonBody;
-import hu.zoldleo.dragonborn.registry.DragonbornContainers;
-import net.minecraft.tags.TagKey;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
+import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonAbility;
+import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonBody;
+import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonDiet;
+import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonType;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DataPackRegistryEvent;
 
 @Mod(Dragonborn.MODID)
 public class Dragonborn {
     public static final String MODID = "dragonborn_lib";
-    public static final TagKey<DragonSpecies> DRAGONBORN_SPECIES = TagKey.create(DragonSpecies.REGISTRY, DragonSurvival.res("dragonborn_species"));
-    public static final TagKey<DragonSpecies> CAN_EAT_HUMAN_FOOD = TagKey.create(DragonSpecies.REGISTRY, DragonSurvival.res("can_eat_human_food"));
-    public static final TagKey<DragonBody> CAN_USE_CUSTOM_SKIN = TagKey.create(DragonBody.REGISTRY, DragonSurvival.res("can_use_custom_skin"));
+    public Dragonborn() {
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        bus.addListener(Dragonborn::datapackRegistryEvent);
+    }
 
-    public Dragonborn(IEventBus modEventBus) {
-        DragonbornContainers.REGISTRY.register(modEventBus);
+    public static void datapackRegistryEvent(DataPackRegistryEvent.NewRegistry event) {
+        event.dataPackRegistry(DataDrivenDragonType.REGISTRY, DataDrivenDragonType.DIRECT_CODEC);
+        event.dataPackRegistry(DataDrivenDragonBody.REGISTRY, DataDrivenDragonBody.DIRECT_CODEC);
+        event.dataPackRegistry(DataDrivenDragonAbility.REGISTRY, DataDrivenDragonAbility.DIRECT_CODEC);
+        event.dataPackRegistry(DataDrivenDragonDiet.REGISTRY, DataDrivenDragonDiet.DietModifier.DIRECT_CODEC);
     }
 }

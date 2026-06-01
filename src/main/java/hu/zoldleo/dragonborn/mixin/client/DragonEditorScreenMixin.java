@@ -20,16 +20,19 @@
 
 package hu.zoldleo.dragonborn.mixin.client;
 
-import by.dragonsurvivalteam.dragonsurvival.client.gui.screens.dragon_editor.DragonEditorScreen;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import by.dragonsurvivalteam.dragonsurvival.client.gui.dragon_editor.DragonEditorScreen;
+import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(DragonEditorScreen.class)
+@Mixin(value = DragonEditorScreen.class, remap = false)
 public class DragonEditorScreenMixin {
-    @ModifyReturnValue(method = "setZoom", at = @At("RETURN"))
-    private static float dontZoomDragonborn(float original) {
-        return DragonbornUtils.isDragonborn(DragonEditorScreen.HANDLER) ? 32 : original;
+    @Inject(method = "initialize", at = @At("RETURN"))
+    private void dontZoomDragonborn(DragonStateHandler localHandler, CallbackInfo ci) {
+        if (DragonbornUtils.isDragonborn(localHandler))
+            ((DragonEditorScreen)(Object)this).dragonRender.zoom = 32;
     }
 }

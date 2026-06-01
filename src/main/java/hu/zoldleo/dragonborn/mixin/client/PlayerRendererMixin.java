@@ -20,9 +20,9 @@
 
 package hu.zoldleo.dragonborn.mixin.client;
 
-import by.dragonsurvivalteam.dragonsurvival.client.render.ClientDragonRenderer;
+import by.dragonsurvivalteam.dragonsurvival.client.render.ClientDragonRender;
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
-import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
+import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
 import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -43,7 +43,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(PlayerRenderer.class)
+@Mixin(value = PlayerRenderer.class, remap = false)
 public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     public PlayerRendererMixin(EntityRendererProvider.Context context, PlayerModel<AbstractClientPlayer> model, float shadowRadius) {
         super(context, model, shadowRadius);
@@ -54,25 +54,27 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
         addLayer(new RenderLayer<>(this) {
             @Override
             public void render(@NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int packedLight, @NotNull AbstractClientPlayer player, float v, float v1, float partialTicks, float v3, float v4, float v5) {
-                DragonStateHandler handler = player.getData(DSDataAttachments.DRAGON_HANDLER);
+                DragonStateHandler handler = DragonbornUtils.getHandler(player);
                 if (DragonbornUtils.isDragonborn(handler) && !player.isInvisible()) {
                     poseStack.pushPose();
                     poseStack.mulPose(Axis.XP.rotationDegrees(180f));
                     float scale = 1f / player.getScale();
                     poseStack.scale(scale, scale, scale);
-                    Minecraft.getInstance().getEntityRenderDispatcher().render(ClientDragonRenderer.getOrCreateDragon(player), 0, 0, 0, 0, partialTicks, poseStack, buffer, packedLight);
+                    DragonEntity dragon = ClientDragonRender.getDragon(player);
+                    if (dragon != null)
+                        Minecraft.getInstance().getEntityRenderDispatcher().render(dragon, 0, 0, 0, 0, partialTicks, poseStack, buffer, packedLight);
                     poseStack.popPose();
                 }
             }
         });
     }
 
-    @ModifyExpressionValue(method = "setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isAutoSpinAttack()Z"))
+    @ModifyExpressionValue(method = "setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isAutoSpinAttack()Z"))
     private boolean spin(boolean original, @Local(argsOnly = true) AbstractClientPlayer player) {
         return original || (DragonbornUtils.isDragonborn(player) && ServerFlightHandler.isSpin(player));
     }
 
-    @ModifyExpressionValue(method = "setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isFallFlying()Z"))
+    @ModifyExpressionValue(method = "setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isFallFlying()Z"))
     private boolean glide(boolean original, @Local(argsOnly = true) AbstractClientPlayer player) {
         return original || (DragonbornUtils.isDragonborn(player) && ServerFlightHandler.isGliding(player));
     }

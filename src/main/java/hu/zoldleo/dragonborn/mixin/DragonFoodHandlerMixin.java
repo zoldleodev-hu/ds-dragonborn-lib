@@ -20,23 +20,60 @@
 
 package hu.zoldleo.dragonborn.mixin;
 
+import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonType;
 import by.dragonsurvivalteam.dragonsurvival.common.handlers.DragonFoodHandler;
-import by.dragonsurvivalteam.dragonsurvival.registry.dragon.DragonSpecies;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import hu.zoldleo.dragonborn.Dragonborn;
-import net.minecraft.core.Holder;
+import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonDiet;
+import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(DragonFoodHandler.class)
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+@Mixin(value = DragonFoodHandler.class, remap = false)
 public class DragonFoodHandlerMixin {
-    @ModifyReturnValue(method = "getDragonFoodProperties", at = @At(value = "RETURN", ordinal = 3))
-    private static @Nullable FoodProperties addHumanFood(@Nullable FoodProperties dsOriginal, @Local(argsOnly = true) Holder<DragonSpecies> species, @Local(argsOnly = true) FoodProperties original) {
-        if (species.is(Dragonborn.CAN_EAT_HUMAN_FOOD))
-            return original;
-        return dsOriginal;
+    @WrapOperation(method = "getFoodProperties(Lnet/minecraft/world/item/ItemStack;Lby/dragonsurvivalteam/dragonsurvival/common/dragon_types/AbstractDragonType;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/food/FoodProperties;", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
+    private static Object addDataDrivenFood(Map<Item, FoodProperties> instance, Object key, Operation<FoodProperties> original, @Local(argsOnly = true) AbstractDragonType type, @Local(argsOnly = true) ItemStack itemStack, @Local(argsOnly = true) LivingEntity entity) {
+        if (type instanceof DataDrivenDragonType)
+            return DataDrivenDragonDiet.getFoodProperties(type.getTypeName(), itemStack, entity);
+        return original.call(instance, key);
+    }
+
+    @ModifyReturnValue(method = "getFoodProperties(Lnet/minecraft/world/item/ItemStack;Lby/dragonsurvivalteam/dragonsurvival/common/dragon_types/AbstractDragonType;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/food/FoodProperties;", at = @At(value = "RETURN", ordinal = 1))
+    private static @Nullable FoodProperties addHumanFood(@Nullable FoodProperties original, @Local(argsOnly = true) AbstractDragonType type, @Local(name = "properties") FoodProperties properties) {
+        if (type instanceof DataDrivenDragonType dataDrivenType && dataDrivenType.canEatHumanFood)
+            return properties;
+        return original;
+    }
+
+    @WrapOperation(method = "isEdible(Lnet/minecraft/world/item/Item;Lby/dragonsurvivalteam/dragonsurvival/common/dragon_types/AbstractDragonType;)Z", at = @At(value = "INVOKE", target = "Ljava/util/Map;containsKey(Ljava/lang/Object;)Z"))
+    private static boolean canEatDataDrivenFood(Map<Item, FoodProperties> instance, Object key, Operation<Boolean> original, @Local(argsOnly = true) Item item, @Local(argsOnly = true) AbstractDragonType type) {
+        if (type instanceof DataDrivenDragonType)
+            return DataDrivenDragonDiet.canEatItem(type.getTypeName(), item);
+        return original.call(instance, key);
+    }
+
+    @WrapOperation(method = "isEdible(Lnet/minecraft/world/item/ItemStack;Lby/dragonsurvivalteam/dragonsurvival/common/dragon_types/AbstractDragonType;)Z", at = @At(value = "INVOKE", target = "Ljava/util/Map;containsKey(Ljava/lang/Object;)Z"))
+    private static boolean canEatDataDrivenFood(Map<Item, FoodProperties> instance, Object key, Operation<Boolean> original, @Local(argsOnly = true) ItemStack itemStack, @Local(argsOnly = true) AbstractDragonType type) {
+        if (type instanceof DataDrivenDragonType)
+            return DataDrivenDragonDiet.canEatItem(type.getTypeName(), itemStack.getItem());
+        return original.call(instance, key);
+    }
+
+    @Inject(method = "getEdibleFoods", at = @At("HEAD"), cancellable = true)
+    private static void getDataDrivenFood(AbstractDragonType type, CallbackInfoReturnable<CopyOnWriteArrayList<Item>> cir) {
+        if (type instanceof DataDrivenDragonType)
+            cir.setReturnValue(new CopyOnWriteArrayList<>(DataDrivenDragonDiet.getDietForType(type.getTypeName()).keySet()));
     }
 }

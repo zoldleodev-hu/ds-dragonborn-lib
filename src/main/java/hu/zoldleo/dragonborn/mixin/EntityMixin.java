@@ -20,7 +20,7 @@
 
 package hu.zoldleo.dragonborn.mixin;
 
-import com.bawnorton.mixinsquared.TargetHandler;
+/*/import com.bawnorton.mixinsquared.TargetHandler;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
@@ -28,29 +28,29 @@ import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(value = Entity.class, priority = 1500)
+@Mixin(value = Entity.class, priority = 1500)*/
 public abstract class EntityMixin {
-    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.EntityMixin", name = "dragonSurvival$canRide")
+    /*/@TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.MixinEntity", name = "dragonSurvival$canRide")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z", ordinal = 0))
     private boolean excludeDragonborn(Entity entity, Operation<Boolean> original) {
         return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
     }
 
-    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.EntityMixin", name = "dragonSurvival$modifyPassengerRidingPosition")
+    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.MixinEntity", name = "dragonSurvival$modifyPassengerRidingPosition")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z", ordinal = 0))
     private boolean dragonbornNoOffset1(Entity entity, Operation<Boolean> original) {
         return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
     }
 
-    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.EntityMixin", name = "dragonSurvival$modifyPassengerAttachmentPoint")
+    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.MixinEntity", name = "dragonSurvival$modifyPassengerAttachmentPoint")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z", ordinal = 1))
     private boolean dragonbornNoOffset2(Entity entity, Operation<Boolean> original) {
         return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
     }
 
-    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.EntityMixin", name = "dragonSurvival$modifyPassengerAttachmentPoint")
+    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.MixinEntity", name = "dragonSurvival$modifyPassengerAttachmentPoint")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z", ordinal = 2))
     private boolean dragonbornNoOffset3(Entity entity, Operation<Boolean> original) {
         return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
-    }
+    }*/
 }

@@ -1,5 +1,6 @@
 package hu.zoldleo.dragonborn.mixin;
 
+import net.minecraftforge.fml.loading.LoadingModList;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -11,9 +12,7 @@ public class ApplyMixinPlugin implements IMixinConfigPlugin {
     private final static String PREFIX = ApplyMixinPlugin.class.getPackageName() + ".";
 
     @Override
-    public void onLoad(String mixinPackage) {
-
-    }
+    public void onLoad(final String mixinPackage) { /* Nothing to do */ }
 
     @Override
     public String getRefMapperConfig() {
@@ -21,14 +20,21 @@ public class ApplyMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+    public boolean shouldApplyMixin(final String targetClassName, final String mixinClassName) {
+        String modid = mixinClassName.replace(PREFIX, "");
+        // Remove directories which are not related to mods
+        modid = modid.replace("client.", "");
+        // If a directory is still present it will run through the check below
+        String[] elements = modid.split("\\.");
+
+        if (elements.length == 2)
+            return LoadingModList.get().getModFileById(elements[0]) != null;
+
         return true;
     }
 
     @Override
-    public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
-
-    }
+    public void acceptTargets(final Set<String> myTargets, final Set<String> otherTargets) { /* Nothing to do */ }
 
     @Override
     public List<String> getMixins() {
@@ -36,12 +42,8 @@ public class ApplyMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
-    }
+    public void preApply(final String targetClassName, final ClassNode targetClass, final String mixinClassName, final IMixinInfo mixinInfo) { /* Nothing to do */ }
 
     @Override
-    public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
-    }
+    public void postApply(final String targetClassName, final ClassNode targetClass, final String mixinClassName, final IMixinInfo mixinInfo) { /* Nothing to do */ }
 }

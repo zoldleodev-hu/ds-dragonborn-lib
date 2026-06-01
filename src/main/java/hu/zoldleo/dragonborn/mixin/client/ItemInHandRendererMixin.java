@@ -29,17 +29,17 @@ import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(value = ItemInHandRenderer.class, priority = 1500)
+@Mixin(value = ItemInHandRenderer.class, priority = 1500, remap = false)
 public class ItemInHandRendererMixin {
-    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.client.ItemInHandRendererMixin", name = "dragonSurvival$skipRender")
-    @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean renderArm(Entity player, Operation<Boolean> original) {
-        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
+    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.MixinItemInHandRenderer", name = "hideArmsForDragon")
+    @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/util/DragonUtils;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean renderArm(Entity entity, Operation<Boolean> original) {
+        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
     }
 
-    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.client.ItemInHandRendererMixin", name = "dragonSurvival$skipRenderWhenHoldingMaps")
-    @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean renderArmWhenHoldingMaps(Entity player, Operation<Boolean> original) {
-        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
+    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.MixinItemInHandRenderer", name = "hideArmsForDragonTwoHandedMap")
+    @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/util/DragonUtils;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean renderArmWhenHoldingMaps(Entity entity, Operation<Boolean> original) {
+        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
     }
 }

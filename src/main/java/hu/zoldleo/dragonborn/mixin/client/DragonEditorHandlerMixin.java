@@ -20,114 +20,67 @@
 
 package hu.zoldleo.dragonborn.mixin.client;
 
-import by.dragonsurvivalteam.dragonsurvival.DragonSurvival;
-import by.dragonsurvivalteam.dragonsurvival.client.gui.screens.dragon_editor.DragonEditorScreen;
+import by.dragonsurvivalteam.dragonsurvival.DragonSurvivalMod;
+import by.dragonsurvivalteam.dragonsurvival.client.gui.dragon_editor.DragonEditorScreen;
 import by.dragonsurvivalteam.dragonsurvival.client.skin_editor_system.DragonEditorHandler;
-import by.dragonsurvivalteam.dragonsurvival.client.skin_editor_system.SkinLayer;
-import by.dragonsurvivalteam.dragonsurvival.client.skin_editor_system.objects.DragonPart;
-import by.dragonsurvivalteam.dragonsurvival.client.skin_editor_system.objects.LayerSettings;
 import by.dragonsurvivalteam.dragonsurvival.client.util.FakeClientPlayer;
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
-import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
-import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import hu.zoldleo.dragonborn.mixin.DragonStateHandlerAccessor;
+import com.mojang.blaze3d.platform.NativeImage;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.client.event.RegisterShadersEvent;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
+import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
 
 @SuppressWarnings("all")
-@Mixin(DragonEditorHandler.class)
+@Mixin(value = DragonEditorHandler.class, remap = false)
 public class DragonEditorHandlerMixin {
-    @Shadow
-    private static ShaderInstance skinGenerationShader;
-    @Unique
-    private static ShaderInstance dragonborn$skinGenerationMaskShader;
+    @ModifyVariable(method = "genTextures", at = @At(value = "STORE", ordinal = 1))
+    private static NativeImage addPlayerTexture(NativeImage original, @Local(argsOnly = true) Player player, @Local(argsOnly = true) DragonStateHandler handler) throws NoSuchFieldException, IllegalAccessException {
+        if (player instanceof FakeClientPlayer fake)
+            handler = fake.handler;
 
-    @Inject(method = "generateSkinTextures", at = @At(value = "INVOKE_ASSIGN", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;getCurrentStageCustomization()Lby/dragonsurvivalteam/dragonsurvival/client/skin_editor_system/objects/DragonStageCustomization;"))
-    private static void addPlayerTexture(DragonEntity dragon, CallbackInfo ci, @Local(name = "normalTarget") RenderTarget normalTarget, @Local(name = "currentViewportX") int viewportX, @Local(name = "currentViewportY") int viewportY, @Local(name = "currentViewportWidth") int viewportW, @Local(name = "currentViewportHeight") int viewportH) {
-        if (dragon.getPlayer() instanceof AbstractClientPlayer player) {
-            DragonStateHandler handler = player.getData(DSDataAttachments.DRAGON_HANDLER);
-            if (dragon.getPlayer() instanceof FakeClientPlayer fake) {
-                handler = fake.handler;
-            }
-            if (DragonbornUtils.isDragonborn(handler)) {
-                PlayerSkin fakeSkin = ((DragonStateHandlerAccessor)(handler)).dragonborn$getFakeSkin();
-                PlayerSkin skin = (fakeSkin == null) ? player.getSkin() : fakeSkin;
-                AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(skin.texture());
+        if (DragonbornUtils.isDragonborn(handler) && player instanceof AbstractClientPlayer clientPlayer) {
+            ResourceLocation fakeSkin = (ResourceLocation)handler.getClass().getField("dragonborn$fakeSkinTexture").get(handler);
+            ResourceLocation skin = (fakeSkin == null) ? clientPlayer.getSkinTextureLocation() : fakeSkin;
+            AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(skin);
 
-                if (handler == DragonEditorScreen.HANDLER && Minecraft.getInstance().player instanceof LocalPlayer local)
-                    texture = Minecraft.getInstance().getTextureManager().getTexture(local.getSkin().texture());
+            if (handler == DragonEditorScreen.handler)
+                texture = Minecraft.getInstance().getTextureManager().getTexture(Minecraft.getInstance().player.getSkinTextureLocation());
 
-                normalTarget.bindWrite(true);
+            try {
+                Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(skin);
+                if (resource.isEmpty())
+                    throw new IOException(String.format("Resource %s not found!", skin.getPath()));
 
-                RenderSystem.enableBlend();
-                RenderSystem.colorMask(true, true, true, true);
-                RenderSystem.blendEquation(32774);
-                RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-                RenderSystem.disableDepthTest();
-                RenderSystem.depthMask(false);
-                skinGenerationShader.setSampler("SkinTexture", texture);
-                skinGenerationShader.getUniform("HueVal").set(0f);
-                skinGenerationShader.getUniform("SatVal").set(0f);
-                skinGenerationShader.getUniform("BrightVal").set(0f);
-                skinGenerationShader.getUniform("Colorable").set(0f);
-                skinGenerationShader.getUniform("Glowing").set(0f);
-                skinGenerationShader.apply();
-                BufferBuilder bufferbuilder = RenderSystem.renderThreadTesselator().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.BLIT_SCREEN);
-                bufferbuilder.addVertex(0.0F, 0.0F, 0.0F);
-                bufferbuilder.addVertex(1.0F, 0.0F, 0.0F);
-                bufferbuilder.addVertex(1.0F, 1.0F, 0.0F);
-                bufferbuilder.addVertex(0.0F, 1.0F, 0.0F);
-                GlStateManager._viewport(0, 448, 64, 64);
-                BufferUploader.draw(bufferbuilder.buildOrThrow());
-                GlStateManager._viewport(viewportX, viewportY, viewportW, viewportH);
+                InputStream textureStream = ((Resource)resource.get()).open();
+                NativeImage tempColorPicker = NativeImage.read(textureStream);
+                textureStream.close();
 
-                skinGenerationShader.clear();
-                normalTarget.unbindWrite();
+                for(int x = 0; x < tempColorPicker.getWidth(); ++x) {
+                    for(int y = 0; y < tempColorPicker.getHeight(); ++y) {
+                        Color color = new Color(tempColorPicker.getPixelRGBA(x, y), true);
+                        if (color.getAlpha() != 0)
+                            original.setPixelRGBA(x, y, color.getRGB());
+                    }
+                }
+
+                tempColorPicker.close();
+            } catch (IOException e) {
+                DragonSurvivalMod.LOGGER.error("An error occured while compiling the dragon skin texture", e);
             }
         }
-    }
-
-    @Inject(method = "generateSkinTextures", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;renderThreadTesselator()Lcom/mojang/blaze3d/vertex/Tesselator;", ordinal = 0))
-    private static void applyMask(DragonEntity dragon, CallbackInfo ci, @Local(name = "texture") AbstractTexture texture, @Local(name = "hueVal") float hueVal, @Local(name = "satVal") float satVal, @Local(name = "brightVal") float brightVal, @Local(name = "skinTexture") DragonPart skinTexture, @Local(name = "settings") LayerSettings settings, @Local(name = "layer") SkinLayer layer, @Local(name = "handler") DragonStateHandler handler) {
-        ResourceLocation maskLocation = DragonSurvival.res("textures/dragon/custom/masks/" + handler.body().value().model().getPath() + '/' + layer.getNameLowerCase() + "_mask.png");
-        if (Minecraft.getInstance().getResourceManager().getResource(maskLocation).isEmpty())
-            return;
-        AbstractTexture mask = Minecraft.getInstance().getTextureManager().getTexture(maskLocation);
-        dragonborn$skinGenerationMaskShader.setSampler("SkinTexture", texture);
-        dragonborn$skinGenerationMaskShader.setSampler("SkinTextureMask", mask);
-        dragonborn$skinGenerationMaskShader.getUniform("HueVal").set(hueVal);
-        dragonborn$skinGenerationMaskShader.getUniform("SatVal").set(satVal);
-        dragonborn$skinGenerationMaskShader.getUniform("BrightVal").set(brightVal);
-        dragonborn$skinGenerationMaskShader.getUniform("Colorable").set(skinTexture.isColorable() ? 1.0F : 0.0F);
-        dragonborn$skinGenerationMaskShader.getUniform("Glowing").set(settings.isGlowing ? 1.0F : 0.0F);
-        dragonborn$skinGenerationMaskShader.apply();
-    }
-
-    @Inject(method = "registerShaders", at = @At("TAIL"))
-    private static void registerMaskShader(RegisterShadersEvent event, CallbackInfo ci) throws IOException {
-        event.registerShader(new ShaderInstance(event.getResourceProvider(), DragonSurvival.res("skin_generation_mask"), DefaultVertexFormat.BLIT_SCREEN), (instance) -> dragonborn$skinGenerationMaskShader = instance);
+        return original;
     }
 }

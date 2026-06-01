@@ -21,18 +21,23 @@
 package hu.zoldleo.dragonborn.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
-import net.minecraft.client.resources.PlayerSkin;
-import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(DragonStateHandler.class)
-public interface DragonStateHandlerAccessor {
-    @Accessor("dragonborn$fakeSkin")
+public interface DragonStateHandlerAccessor { // Dynamic Accessors aren't working for some reason
+    /*/@Accessor(value = "dragonborn$fakeSkinModelName", remap = false)
     @Dynamic
-    PlayerSkin dragonborn$getFakeSkin();
+    String dragonborn$getFakeSkinModelName();
 
-    @Accessor("dragonborn$fakeSkin")
+    @Accessor(value = "dragonborn$fakeSkinTexture", remap = false)
     @Dynamic
-    void dragonborn$setFakeSkin(PlayerSkin skin);
+    ResourceLocation dragonborn$getFakeSkinTexture();
+
+    @Accessor(value = "dragonborn$fakeSkinModelName", remap = false)
+    @Dynamic
+    void dragonborn$setFakeSkinModelName(String skin);
+
+    @Accessor(value = "dragonborn$fakeSkinTexture", remap = false)
+    @Dynamic
+    void dragonborn$setFakeSkinTexture(ResourceLocation skin);*/
 }

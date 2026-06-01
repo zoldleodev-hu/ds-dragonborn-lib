@@ -20,25 +20,22 @@
 
 package hu.zoldleo.dragonborn.registry;
 
-import hu.zoldleo.dragonborn.Dragonborn;
-import hu.zoldleo.dragonborn.client.DragonbornInventoryScreen;
 import hu.zoldleo.dragonborn.server.DragonbornContainer;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
 
 @EventBusSubscriber
 public class DragonbornContainers {
-    public static final DeferredRegister<MenuType<?>> REGISTRY = DeferredRegister.create(BuiltInRegistries.MENU, Dragonborn.MODID);
-    public static final DeferredHolder<MenuType<?>, MenuType<DragonbornContainer>> DRAGONBORN_CONTAINER = REGISTRY.register("dragonborn_container", () -> new MenuType<>(DragonbornContainer::new, FeatureFlags.DEFAULT_FLAGS));
+    public static MenuType<DragonbornContainer> dragonbornContainer;
 
     @SubscribeEvent
-    public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(DRAGONBORN_CONTAINER.get(), DragonbornInventoryScreen::new);
+    public static void registerScreens(RegisterEvent event) {
+        dragonbornContainer = IForgeMenuType.create((id, inv, buf) -> new DragonbornContainer(id, inv));
+        event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("dragonsurvival", "dragonborn_container"), () -> dragonbornContainer);
     }
 }

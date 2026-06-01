@@ -1,45 +1,39 @@
 {
   "required": true,
   "package": "hu.zoldleo.dragonborn.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
+  "refmap": "dragonborn_lib.refmap.json",
   "mixins": [
-    "DragonEntityMixin",
+    "DragonCommandMixin",
     "DragonFoodHandlerMixin",
-    "DragonRidingHandlerMixin",
     "DragonSizeHandlerMixin",
-    "DragonSoulItemMixin",
     "DragonStateHandlerAccessor",
     "DragonStateHandlerMixin",
-    "EntityMixin",
+    "DragonTypesMixin",
     "LivingEntityMixin",
+    "MagicHandlerMixin",
     "PlayerAccessor",
     "PlayerMixin",
     "RequestOpenDragonInventoryMixin",
-    "ServerFlightHandlerMixin",
     "SortingHandlerMixin",
-    "SyncCompleteMixin"
+    "SyncCompleteMixin",
+    "SynchronizeDragonCapMixin",
+    "client.DragonGlowLayerRendererMixin"
   ],
   "client": [
     "client.ClientDragonRendererMixin",
     "client.ClientFlightHandlerMixin",
-    "client.DragonAltarScreenMixin",
+    "client.DragonAltarGUIMixin",
+    "client.DragonBodyButtonMixin",
     "client.DragonEditorHandlerMixin",
     "client.DragonEditorScreenMixin",
-    "client.DragonGlowLayerRendererMixin",
     "client.DragonModelMixin",
     "client.DragonRendererMixin",
-    "client.DragonSoulRendererMixin",
-    "client.DragonSurvivalClientMixin",
-    "client.InventoryScreenMixin",
+    "client.DragonScreenMixin",
     "client.ItemInHandRendererMixin",
-    "client.LevelRendererMixin",
     "client.LivingEntityRendererMixin",
     "client.MagicHUDMixin",
-    "client.PlayerRendererMixin",
-    "client.SmithingScreenMixin"
-  ],
-  "injectors": {
-    "maxShiftBy": 2
-  }
+    "client.PlayerRendererMixin"
+  ]
 }

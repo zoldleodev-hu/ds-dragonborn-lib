@@ -20,19 +20,29 @@
 
 package hu.zoldleo.dragonborn.server;
 
+import com.mojang.datafixers.util.Pair;
 import hu.zoldleo.dragonborn.registry.DragonbornContainers;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.inventory.ResultSlot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -47,7 +57,7 @@ public class DragonbornContainer extends AbstractContainerMenu {
     public final Inventory playerInventory;
 
     public DragonbornContainer(int id, Inventory inventory) {
-        super(DragonbornContainers.DRAGONBORN_CONTAINER.get(), id);
+        super(DragonbornContainers.dragonbornContainer, id);
         this.player = inventory.player;
         this.playerInventory = inventory;
         // Crafting result
@@ -64,7 +74,22 @@ public class DragonbornContainer extends AbstractContainerMenu {
 
     private void addArmorSlots(Inventory inventory) {
         for(int i = 0; i < 4; ++i) {
-            this.addSlot(new ArmorSlot(inventory, this.player, VALID_EQUIPMENT_SLOTS[i], 39 - i, 8, 8 + i * 18, ARMOR_SLOT_TEXTURES[i]));
+            final EquipmentSlot equipmentSlot = VALID_EQUIPMENT_SLOTS[i];
+            this.addSlot(new Slot(inventory, 39 - i, 8, 8 + i * 18) {
+                public boolean mayPlace(@NotNull ItemStack itemStack) {
+                    return itemStack.canEquip(equipmentSlot, DragonbornContainer.this.player);
+                }
+
+                @OnlyIn(Dist.CLIENT)
+                public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
+                    return Pair.of(InventoryMenu.BLOCK_ATLAS, DragonbornContainer.ARMOR_SLOT_TEXTURES[equipmentSlot.getIndex()]);
+                }
+
+                public boolean mayPickup(@NotNull Player player) {
+                    ItemStack itemStack = this.getItem();
+                    return (itemStack.isEmpty() || player.isCreative() || !EnchantmentHelper.hasBindingCurse(itemStack)) && super.mayPickup(player);
+                }
+            });
         }
     }
 
@@ -96,7 +121,7 @@ public class DragonbornContainer extends AbstractContainerMenu {
         if (slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            EquipmentSlot equipmentslot = player.getEquipmentSlotForItem(itemstack);
+            EquipmentSlot equipmentslot = LivingEntity.getEquipmentSlotForItem(itemstack);
             if (index == 0) {
                 if (!moveItemStackTo(itemstack1, 9, 45, true)) {
                     return ItemStack.EMPTY;
@@ -111,7 +136,7 @@ public class DragonbornContainer extends AbstractContainerMenu {
                 if (!moveItemStackTo(itemstack1, 9, 45, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (equipmentslot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !slots.get(8 - equipmentslot.getIndex()).hasItem()) {
+            } else if (equipmentslot.getType() == EquipmentSlot.Type.ARMOR && !slots.get(8 - equipmentslot.getIndex()).hasItem()) {
                 int i = 8 - equipmentslot.getIndex();
                 if (!moveItemStackTo(itemstack1, i, i + 1, false)) {
                     return ItemStack.EMPTY;
@@ -133,7 +158,7 @@ public class DragonbornContainer extends AbstractContainerMenu {
             }
 
             if (itemstack1.isEmpty()) {
-                slot.setByPlayer(ItemStack.EMPTY, itemstack);
+                slot.set(ItemStack.EMPTY);
             } else {
                 slot.setChanged();
             }
@@ -163,12 +188,11 @@ public class DragonbornContainer extends AbstractContainerMenu {
     public void slotsChanged(@NotNull Container inventory) {
         if (player instanceof ServerPlayer serverPlayer) {
             ItemStack itemStack = ItemStack.EMPTY;
-            Optional<RecipeHolder<CraftingRecipe>> recipeOptional = serverPlayer.serverLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), serverPlayer.level());
+            Optional<CraftingRecipe> recipeOptional = serverPlayer.serverLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix, serverPlayer.level());
             if (recipeOptional.isPresent()) {
-                RecipeHolder<CraftingRecipe> recipe = recipeOptional.get();
-                if (craftResult.setRecipeUsed(player.level(), serverPlayer, recipe)) {
-                    itemStack = (recipe.value()).assemble(craftMatrix.asCraftInput(), serverPlayer.level().registryAccess());
-                }
+                CraftingRecipe recipe = recipeOptional.get();
+                if (craftResult.setRecipeUsed(player.level(), serverPlayer, recipe))
+                    itemStack = recipe.assemble(craftMatrix, serverPlayer.level().registryAccess());
             }
 
             craftResult.setItem(45, itemStack);

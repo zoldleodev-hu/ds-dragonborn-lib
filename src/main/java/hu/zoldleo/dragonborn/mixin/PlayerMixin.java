@@ -20,14 +20,9 @@
 
 package hu.zoldleo.dragonborn.mixin;
 
-import by.dragonsurvivalteam.dragonsurvival.registry.attachments.TreasureRestData;
 import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
-import com.bawnorton.mixinsquared.TargetHandler;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -35,14 +30,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = Player.class, priority = 1500)
+@Mixin(value = Player.class, priority = 1500, remap = false)
 public abstract class PlayerMixin {
     // Might be unused
-    @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.PlayerMixin", name = "dragonSurvival$checkDragonHitbox")
+    /*/@TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.MixinPlayerEntity", name = "dragonSurvival$checkDragonHitbox")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean excludeDragonborn(Entity player, Operation<Boolean> original) {
         return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
-    }
+    }*/
 
     @ModifyExpressionValue(method = "updatePlayerPose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isAutoSpinAttack()Z"))
     private boolean spin(boolean original) {
@@ -59,13 +54,13 @@ public abstract class PlayerMixin {
     @ModifyExpressionValue(method = "updatePlayerPose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSleeping()Z"))
     private boolean rest(boolean original) {
         Player player = (Player)(Object)this;
-        return original || TreasureRestData.getData(player).isResting();
+        return original || DragonbornUtils.getHandler(player).treasureResting;
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void setBedOrientation(CallbackInfo ci) {
         Player player = (Player)(Object)this;
-        if (DragonbornUtils.isDragonborn(player) && !TreasureRestData.getData(player).isResting())
+        if (DragonbornUtils.isDragonborn(player) && !DragonbornUtils.getHandler(player).treasureResting)
             dragonborn$sleepDir = player.yHeadRot;
     }
 
@@ -75,5 +70,5 @@ public abstract class PlayerMixin {
 
     @Unique
     @SuppressWarnings("all")
-    private float dragonborn$sleepDir;
+    public float dragonborn$sleepDir;
 }

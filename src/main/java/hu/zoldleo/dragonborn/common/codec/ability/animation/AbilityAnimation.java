@@ -1,0 +1,15 @@
+package hu.zoldleo.dragonborn.common.codec.ability.animation;
+
+import software.bernie.geckolib.core.animation.AnimationState;
+
+public interface AbilityAnimation {
+    void play(AnimationState<?> state, AnimationType animationType);
+
+    boolean locksHead();
+
+    boolean locksTail();
+
+    AnimationLayer getLayer();
+
+    String getName();
+}
