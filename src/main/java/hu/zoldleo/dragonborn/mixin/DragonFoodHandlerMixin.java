@@ -21,29 +21,25 @@
 package hu.zoldleo.dragonborn.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonType;
+import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.DragonTypes;
 import by.dragonsurvivalteam.dragonsurvival.common.handlers.DragonFoodHandler;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonDiet;
-import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonType;
-import net.minecraft.world.entity.LivingEntity;
+import hu.zoldleo.dragonborn.api.dragon_type.IDietProvider;
+import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Mixin(value = DragonFoodHandler.class, remap = false)
 public class DragonFoodHandlerMixin {
-    @WrapOperation(method = "getFoodProperties(Lnet/minecraft/world/item/ItemStack;Lby/dragonsurvivalteam/dragonsurvival/common/dragon_types/AbstractDragonType;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/food/FoodProperties;", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
+    /*/@WrapOperation(method = "getFoodProperties(Lnet/minecraft/world/item/ItemStack;Lby/dragonsurvivalteam/dragonsurvival/common/dragon_types/AbstractDragonType;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/food/FoodProperties;", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
     private static Object addDataDrivenFood(Map<Item, FoodProperties> instance, Object key, Operation<FoodProperties> original, @Local(argsOnly = true) AbstractDragonType type, @Local(argsOnly = true) ItemStack itemStack, @Local(argsOnly = true) LivingEntity entity) {
         if (type instanceof DataDrivenDragonType)
             return DataDrivenDragonDiet.getFoodProperties(type.getTypeName(), itemStack, entity);
@@ -75,5 +71,24 @@ public class DragonFoodHandlerMixin {
     private static void getDataDrivenFood(AbstractDragonType type, CallbackInfoReturnable<CopyOnWriteArrayList<Item>> cir) {
         if (type instanceof DataDrivenDragonType)
             cir.setReturnValue(new CopyOnWriteArrayList<>(DataDrivenDragonDiet.getDietForType(type.getTypeName()).keySet()));
+    }*/
+
+    @Shadow
+    private static ConcurrentHashMap<Item, FoodProperties> buildDragonFoodMap(AbstractDragonType type) {
+        throw new UnsupportedOperationException("Implemented via mixin");
+    }
+
+    @Inject(method = "rebuildFoodMap", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/handlers/DragonFoodHandler;clearTooltipMaps()V"))
+    private static void buildCustomSpeciesFood(CallbackInfo ci, @Local(name = "map") ConcurrentHashMap<String, ConcurrentHashMap<Item, FoodProperties>> map) {
+        DragonTypes.staticTypes.values().stream().filter(x ->
+                !(DragonbornUtils.isDragonType(x, DragonTypes.CAVE) ||
+                DragonbornUtils.isDragonType(x, DragonTypes.FOREST) ||
+                DragonbornUtils.isDragonType(x, DragonTypes.SEA))
+        ).forEach(x -> map.put(x.getTypeName(), buildDragonFoodMap(x)));
+    }
+
+    @ModifyArg(method = "buildDragonFoodMap", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;of([Ljava/lang/Object;)Ljava/util/stream/Stream;"))
+    private static Object[] getFoodListFromProvider(Object[] values, @Local(argsOnly = true) AbstractDragonType type) {
+        return type instanceof IDietProvider provider ? provider.getDietConfig().toArray() : values;
     }
 }

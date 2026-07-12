@@ -24,52 +24,54 @@ import by.dragonsurvivalteam.dragonsurvival.client.gui.dragon_editor.DragonEdito
 import by.dragonsurvivalteam.dragonsurvival.client.models.DragonModel;
 import by.dragonsurvivalteam.dragonsurvival.client.util.FakeClientPlayer;
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
+import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonBody;
 import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import hu.zoldleo.dragonborn.mixin.DragonStateHandlerAccessor;
+import hu.zoldleo.dragonborn.api.dragon_body.ICustomAnimationProvider;
+import hu.zoldleo.dragonborn.api.dragon_body.ICustomModelProvider;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = DragonModel.class, remap = false)
 public abstract class DragonModelMixin {
     @ModifyReturnValue(method = "getModelResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", at = @At("RETURN"))
-    private ResourceLocation getDragonbornModel(ResourceLocation original, @Local(argsOnly = true) DragonEntity dragon) throws NoSuchFieldException, IllegalAccessException {
-        if (dragon.getPlayer() instanceof AbstractClientPlayer player) {
-            if (player instanceof FakeClientPlayer fake && DragonbornUtils.isDragonborn(fake.handler)) {
-                if (fake.handler == DragonEditorScreen.handler && Minecraft.getInstance().player != null)
-                    player = Minecraft.getInstance().player;
+    private ResourceLocation customModel(ResourceLocation original, @Local(argsOnly = true) DragonEntity dragon) {
+        DragonStateHandler handler = DragonbornUtils.getHandler(dragon.getPlayer());
 
-                String fakeSkin = (String)fake.handler.getClass().getField("dragonborn$fakeSkinModelName").get(fake.handler);
-                String skin = (fakeSkin == null) ? player.getModelName() : fakeSkin;
-                ResourceLocation fakeSkinTexture = (ResourceLocation)fake.handler.getClass().getField("dragonborn$fakeSkinTexture").get(fake.handler);
-                if (skin.equals("slim"))
-                    return fakeSkinTexture.withSuffix("_slim");
-                return fakeSkinTexture.withSuffix("_wide");
-            }
-            else if (DragonbornUtils.isDragonborn(player)) {
-                return original.withSuffix("_extras");
-            }
+        if (!(handler.getBody() instanceof ICustomModelProvider provider))
+            return original;
+
+        if (!DragonbornUtils.isDragonborn(handler))
+            return dragonborn$wrap(provider.modelResource());
+
+        if (dragon.getPlayer() instanceof FakeClientPlayer) {
+            AbstractClientPlayer player = (AbstractClientPlayer) dragon.getPlayer();
+            if (handler == DragonEditorScreen.handler && Minecraft.getInstance().player != null)
+                player = Minecraft.getInstance().player;
+
+            if (player.getModelName().equals("slim"))
+                return dragonborn$wrap(provider.modelResource().withSuffix("_slim"));
+            return dragonborn$wrap(provider.modelResource().withSuffix("_wide"));
         }
-        return original;
+        return dragonborn$wrap(provider.modelResource().withSuffix("_extras"));
     }
 
-    @ModifyExpressionValue(method = "getTextureResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;getTypeNameLowerCase()Ljava/lang/String;"))
-    private String getCustomTypeName(String original) {
-        return new ResourceLocation(original).getPath();
+    @Inject(method = "getAnimationResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", at = @At(value = "INVOKE_ASSIGN", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;getBody()Lby/dragonsurvivalteam/dragonsurvival/common/dragon_types/AbstractDragonBody;"), cancellable = true)
+    private void customAnimation(DragonEntity dragon, CallbackInfoReturnable<ResourceLocation> cir, @Local(name = "body") AbstractDragonBody body) {
+        if (body instanceof ICustomAnimationProvider provider)
+            cir.setReturnValue(provider.animResource().withPrefix("animations/").withSuffix(".json"));
     }
 
-    @ModifyConstant(method = "getTextureResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", constant = @Constant(stringValue = "dragonsurvival"), slice = @Slice(from = @At("HEAD"), to = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;getSkinData()Lby/dragonsurvivalteam/dragonsurvival/common/capability/subcapabilities/SkinCap;", ordinal = 3)))
-    private String setCustomTypeNamespace(String constant, @Local(name = "handler") DragonStateHandler handler) {
-        ResourceLocation loc = new ResourceLocation(handler.getTypeNameLowerCase());
-        return loc.getNamespace().equals("minecraft") ? "dragonsurvival" : loc.getNamespace();
+    @Unique
+    private static ResourceLocation dragonborn$wrap(ResourceLocation loc) {
+        return loc.withPrefix("geo/").withSuffix(".geo.json");
     }
 }

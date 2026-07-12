@@ -49,7 +49,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
         super(context, model, shadowRadius);
     }
 
-    @Inject(method = "<init>", at = @At("TAIL"))
+    /*/@Inject(method = "<init>", at = @At("TAIL"))
     private void addDragonbornLayer(EntityRendererProvider.Context context, boolean useSlimModel, CallbackInfo ci) {
         addLayer(new RenderLayer<>(this) {
             @Override
@@ -67,7 +67,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
                 }
             }
         });
-    }
+    }*/
 
     @ModifyExpressionValue(method = "setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isAutoSpinAttack()Z"))
     private boolean spin(boolean original, @Local(argsOnly = true) AbstractClientPlayer player) {

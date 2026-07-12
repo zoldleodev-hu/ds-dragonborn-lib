@@ -28,7 +28,12 @@ repositories {
         }
     }
     maven { url "https://maven.bawnorton.com/releases" }
-    maven { url "https://cursemaven.com" }
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup("curse.maven")
+        }
+    }
 }
 
 base {

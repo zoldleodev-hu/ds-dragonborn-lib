@@ -20,10 +20,10 @@
 
 package hu.zoldleo.dragonborn.mixin;
 
-import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
-import org.spongepowered.asm.mixin.Mixin;
+/*/import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
+import org.spongepowered.asm.mixin.Mixin;*/
 
-@Mixin(DragonStateHandler.class)
+//@Mixin(DragonStateHandler.class)
 public interface DragonStateHandlerAccessor { // Dynamic Accessors aren't working for some reason
     /*/@Accessor(value = "dragonborn$fakeSkinModelName", remap = false)
     @Dynamic

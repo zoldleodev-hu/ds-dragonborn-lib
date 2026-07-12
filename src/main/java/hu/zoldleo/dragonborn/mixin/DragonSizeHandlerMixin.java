@@ -48,7 +48,7 @@ public abstract class DragonSizeHandlerMixin {
 
     @ModifyExpressionValue(method = "getDragonSize", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;isDragon()Z"))
     private static boolean dragonbornSize(boolean original, @Local(name = "handler") DragonStateHandler handler) {
-        return original && !DragonbornUtils.isDragonDragonborn(handler);
+        return original && !DragonbornUtils.isDragonborn(handler);
     }
 
     /*/@Inject(method = "calculateDimensions", at = @At("HEAD"), cancellable = true)

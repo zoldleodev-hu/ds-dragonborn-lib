@@ -21,55 +21,33 @@
 package hu.zoldleo.dragonborn.util;
 
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
+import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateProvider;
 import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonType;
 import by.dragonsurvivalteam.dragonsurvival.util.DragonUtils;
-import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonType;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
+import hu.zoldleo.dragonborn.api.dragon_type.IDragonborn;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
-
-import java.text.NumberFormat;
 
 public class DragonbornUtils extends DragonUtils {
     public static boolean isDragonborn(DragonStateHandler handler) {
-        return isSpeciesDragonborn(handler.getType());
+        return handler.getType() instanceof IDragonborn;
     }
 
     public static boolean isDragonborn(Player player) {
-        return isDragon(player) && isDragonborn(getHandler(player));
+        return DragonStateProvider.getCap(player).filter(x -> x.getType() instanceof IDragonborn).isPresent();
     }
 
     public static boolean isDragonborn(@Nullable Entity entity) {
-        return entity instanceof Player player && isDragonborn(getHandler(player));
-    }
-
-    public static boolean isDragonDragonborn(DragonStateHandler handler) {
-        return isSpeciesDragonborn(handler.getType());
+        return entity instanceof Player && DragonStateProvider.getCap(entity).filter(x -> x.getType() instanceof IDragonborn).isPresent();
     }
 
     public static boolean isSpeciesDragonborn(AbstractDragonType species) {
-        return species instanceof DataDrivenDragonType type && type.isDragonborn;
-    }
-
-    public static boolean isDragonDragonborn(Player player) {
-        return isDragonDragonborn(getHandler(player));
-    }
-
-    @SuppressWarnings("all")
-    public static boolean isDragonDragonborn(@Nullable Entity entity) {
-        return entity instanceof Player player && isDragonDragonborn(getHandler(player));
+        return species instanceof IDragonborn;
     }
 
     public static void reInsertClawTools(final Player player) {
@@ -80,31 +58,5 @@ public class DragonbornUtils extends DragonUtils {
                 serverPlayer.level().addFreshEntity(new ItemEntity(serverPlayer.level(), serverPlayer.position().x, serverPlayer.position().y, serverPlayer.position().z, stack));
         }
         clawsContainer.clearContent();
-    }
-
-    public static <T> HolderLookup.@Nullable RegistryLookup<T> resolveLookup(ResourceKey<? extends Registry<T>> key) {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server != null)
-            return server.registryAccess().lookup(key).orElse(null);
-        if (!FMLEnvironment.dist.isClient())
-            return null;
-        ClientLevel level = Minecraft.getInstance().level;
-        return level != null ? level.registryAccess().lookup(key).orElse(null) : null;
-    }
-
-    public static <T> Registry<T> resolveRegistry(ResourceKey<? extends Registry<T>> key) {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server != null)
-            return server.registryAccess().registry(key).orElse(null);
-        if (!FMLEnvironment.dist.isClient())
-            return null;
-        ClientLevel level = Minecraft.getInstance().level;
-        return level != null ? level.registryAccess().registry(key).orElse(null) : null;
-    }
-
-    public static NumberFormat numberFormat(int digits) {
-        NumberFormat format = NumberFormat.getInstance();
-        format.setMaximumFractionDigits(digits);
-        return format;
     }
 }

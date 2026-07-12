@@ -34,12 +34,12 @@ public class ItemInHandRendererMixin {
     @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.MixinItemInHandRenderer", name = "hideArmsForDragon")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/util/DragonUtils;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean renderArm(Entity entity, Operation<Boolean> original) {
-        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
+        return original.call(entity) && !DragonbornUtils.isDragonborn(entity);
     }
 
     @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.MixinItemInHandRenderer", name = "hideArmsForDragonTwoHandedMap")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/util/DragonUtils;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean renderArmWhenHoldingMaps(Entity entity, Operation<Boolean> original) {
-        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
+        return original.call(entity) && !DragonbornUtils.isDragonborn(entity);
     }
 }

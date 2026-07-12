@@ -1,14 +1,17 @@
 package hu.zoldleo.dragonborn.mixin;
 
-import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonType;
+/*/import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonType;
 import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.DragonTypes;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonType;
+import hu.zoldleo.dragonborn.api.event.RegisterDragonTypeEvent;
+import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;*/
 
-@Mixin(value = DragonTypes.class, remap = false)
+//@Mixin(value = DragonTypes.class, remap = false)
 public class DragonTypesMixin {
     /*/@Unique
     private static ArrayList<AbstractDragonType> dragonborn$emptyList = new ArrayList<>();
@@ -35,7 +38,7 @@ public class DragonTypesMixin {
         return dragonborn$emptyList;
     }*/
 
-    @ModifyReturnValue(method = "newDragonTypeInstance", at = @At("RETURN"))
+    /*/@ModifyReturnValue(method = "newDragonTypeInstance", at = @At("RETURN"))
     private static AbstractDragonType createDataDrivenInstance(AbstractDragonType original, @Local(argsOnly = true) String name) {
         if (original != null)
             return original;
@@ -43,5 +46,5 @@ public class DragonTypesMixin {
         if (registered == null)
             return null;
         return registered.copy();
-    }
+    }*/
 }

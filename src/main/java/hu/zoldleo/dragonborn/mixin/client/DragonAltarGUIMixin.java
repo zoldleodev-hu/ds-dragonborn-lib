@@ -31,7 +31,8 @@ import by.dragonsurvivalteam.dragonsurvival.util.DragonUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.systems.RenderSystem;
-import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonType;
+//import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonType;
+import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -94,9 +95,14 @@ public class DragonAltarGUIMixin extends Screen {
             hasInit = true;
 
         dragonborn$types.clear();
-        for (String type : DragonTypes.staticTypes.keySet().stream().sorted().toList())
+        dragonborn$types.addAll(List.of(DragonTypes.CAVE, DragonTypes.FOREST, DragonTypes.SEA));
+        dragonborn$types.addAll(DragonTypes.staticTypes.values().stream().filter( x ->
+                !(DragonbornUtils.isDragonType(x, DragonTypes.CAVE) ||
+                DragonbornUtils.isDragonType(x, DragonTypes.FOREST) ||
+                DragonbornUtils.isDragonType(x, DragonTypes.SEA))).toList());
+        /*/for (String type : DragonTypes.staticTypes.keySet().stream().sorted().toList())
             dragonborn$types.add(DragonTypes.getStatic(type));
-        dragonborn$types.addAll(DataDrivenDragonType.getRegisteredDragonTypes());
+        dragonborn$types.addAll(DataDrivenDragonType.getRegisteredDragonTypes());*/
         dragonborn$types.add(null);
 
         DragonAltarGUI self = (DragonAltarGUI)(Object)this;
@@ -118,9 +124,7 @@ public class DragonAltarGUIMixin extends Screen {
                 super.render(guiGraphics, mouseX, mouseY, partialTick);
             }
         });
-        addRenderableWidget(new Button(width / 2 + 105, height / 2 - 5, 15, 15, Component.empty(), button -> {
-            dragonborn$scrollTypes(1);
-        }, Supplier::get) {
+        addRenderableWidget(new Button(width / 2 + 105, height / 2 - 5, 15, 15, Component.empty(), button -> dragonborn$scrollTypes(1), Supplier::get) {
             public void render(@NotNull GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTicks) {
                 active = visible = dragonborn$types.size() > 4;
                 super.render(guiGraphics, pMouseX, pMouseY, pPartialTicks);
@@ -135,9 +139,7 @@ public class DragonAltarGUIMixin extends Screen {
 
             }
         });
-        addRenderableWidget(new Button(width / 2 - 117, height / 2 - 5, 15, 15, Component.empty(), button -> {
-            dragonborn$scrollTypes(-1);
-        }, Supplier::get) {
+        addRenderableWidget(new Button(width / 2 - 117, height / 2 - 5, 15, 15, Component.empty(), button -> dragonborn$scrollTypes(-1), Supplier::get) {
             public void render(@NotNull GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTicks) {
                 active = visible = dragonborn$types.size() > 4;
                 super.render(guiGraphics, pMouseX, pMouseY, pPartialTicks);

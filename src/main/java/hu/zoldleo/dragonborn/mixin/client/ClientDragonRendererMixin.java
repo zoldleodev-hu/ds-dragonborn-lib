@@ -32,21 +32,28 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderPlayerEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import javax.annotation.Nullable;
 
 import static by.dragonsurvivalteam.dragonsurvival.client.render.ClientDragonRender.setDragonMovementData;
 
 @Mixin(value = ClientDragonRender.class, remap = false)
 public class ClientDragonRendererMixin {
-    @SuppressWarnings("all")
-    @ModifyExpressionValue(method = "thirdPersonPreRender", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;isDragon()Z"))
-    private static boolean cancelDragonRender(boolean original, @Local(argsOnly = true) RenderPlayerEvent.Pre event, @Local(name = "dragon") DragonEntity dragon, @Local(name = "player") AbstractClientPlayer player) {
-        if (original && DragonbornUtils.isDragonDragonborn(player)) {
-            if (!dragon.isInInventory && player != Minecraft.getInstance().player || !Minecraft.getInstance().options.getCameraType().isFirstPerson() || !ServerFlightHandler.isGliding(player) || ClientDragonRender.renderFirstPersonFlight)
+    @Shadow
+    @Nullable
+    public static DragonEntity getDragon(Player player) {
+        throw new UnsupportedOperationException("Implemented via mixin");
+    }
+
+    @ModifyExpressionValue(method = "thirdPersonPreRender", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;isDragon()Z", ordinal = 0))
+    private static boolean cancelDragonRender(boolean original, @Local(name = "handler") DragonStateHandler handler, @Local(name = "player") AbstractClientPlayer player) {
+        if (DragonbornUtils.isDragonborn(handler)) {
+            if (!getDragon(player).isInInventory && player != Minecraft.getInstance().player || !Minecraft.getInstance().options.getCameraType().isFirstPerson() || !ServerFlightHandler.isGliding(player) || ClientDragonRender.renderFirstPersonFlight)
                 setDragonMovementData(player, AnimationUtils.getRealtimeDeltaTicks());
             return false;
         }
@@ -55,7 +62,7 @@ public class ClientDragonRendererMixin {
 
     @Inject(method = "lambda$setDragonMovementData$2", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;setMovementData(DDDLnet/minecraft/world/phys/Vec3;)V"), cancellable = true)
     private static void correctYawForDragonborn(Player player, float realtimeDeltaTick, DragonStateHandler playerStateHandler, CallbackInfo ci, @Local(name = "moveVector") Vec3 moveVector) {
-        if (DragonbornUtils.isDragonDragonborn(player)) {
+        if (DragonbornUtils.isDragonborn(player)) {
             playerStateHandler.setMovementData(player.yBodyRot, player.yHeadRot, player.getViewXRot(realtimeDeltaTick), moveVector);
             ci.cancel();
         }
