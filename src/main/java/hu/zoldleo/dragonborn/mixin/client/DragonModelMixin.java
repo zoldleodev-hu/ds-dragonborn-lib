@@ -74,4 +74,9 @@ public abstract class DragonModelMixin {
     private static ResourceLocation dragonborn$wrap(ResourceLocation loc) {
         return loc.withPrefix("geo/").withSuffix(".geo.json");
     }
+
+    /*/@ModifyReturnValue(method = "getTextureResource(Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;)Lnet/minecraft/resources/ResourceLocation;", at = @At("RETURN"))
+    private ResourceLocation test(ResourceLocation original) {
+        return new ResourceLocation("dragonsurvival", "textures/white.png");
+    }*/
 }
