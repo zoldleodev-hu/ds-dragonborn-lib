@@ -25,13 +25,17 @@ import by.dragonsurvivalteam.dragonsurvival.client.gui.dragon_editor.DragonEdito
 import by.dragonsurvivalteam.dragonsurvival.client.gui.widgets.buttons.AltarTypeButton;
 import by.dragonsurvivalteam.dragonsurvival.client.gui.widgets.buttons.generic.HelpButton;
 import by.dragonsurvivalteam.dragonsurvival.client.handlers.magic.ClientMagicHUDHandler;
+import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
+import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonBody;
 import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonType;
+import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.DragonBodies;
 import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.DragonTypes;
 import by.dragonsurvivalteam.dragonsurvival.util.DragonUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.systems.RenderSystem;
 //import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonType;
+import hu.zoldleo.dragonborn.api.dragon_type.IBodyListProvider;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -46,19 +50,18 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Supplier;
 
 @Mixin(value = DragonAltarGUI.class, remap = false)
 public class DragonAltarGUIMixin extends Screen {
     /*/@Shadow
-    public DragonStateHandler handler1;
-
-    @Shadow
     public DragonStateHandler handler2;
 
     @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Ljava/lang/Math;clamp(JII)I", ordinal = 0))
@@ -77,6 +80,8 @@ public class DragonAltarGUIMixin extends Screen {
 
     @Shadow
     private boolean hasInit;
+    @Shadow
+    public DragonStateHandler handler1;
     @Unique
     private List<AbstractDragonType> dragonborn$types = new ArrayList<>();
     @Unique
@@ -200,5 +205,43 @@ public class DragonAltarGUIMixin extends Screen {
         for (int i = 0; i < dragonborn$altarButtons.size(); i++)
             if (dragonborn$scroll + i < dragonborn$types.size())
                 dragonborn$altarButtons.get(i).type = dragonborn$types.get(dragonborn$scroll + i);
+    }
+
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;setBody(Lby/dragonsurvivalteam/dragonsurvival/common/dragon_types/AbstractDragonBody;)V", ordinal = 0))
+    private AbstractDragonBody setFirstBody(AbstractDragonBody body) {
+        if (handler1.getType() instanceof IBodyListProvider provider)
+            return DragonBodies.staticBodies.get(provider.getBodies().get(0));
+        return body;
+    }
+
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/HashMap;get(Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0))
+    private Object validateBody(Object key) {
+        if (handler1.getType() instanceof IBodyListProvider provider) {
+            if (!provider.getBodies().contains((String)key))
+                return provider.getBodies().get(0);
+            return key;
+        }
+        if (!List.of(DragonBodies.ORDER).contains(((String)key).toUpperCase(Locale.ENGLISH)))
+            return "center";
+        return key;
+    }
+
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;setBody(Lby/dragonsurvivalteam/dragonsurvival/common/dragon_types/AbstractDragonBody;)V", ordinal = 2))
+    private AbstractDragonBody randomBody(AbstractDragonBody body) {
+        if (handler1.getType() instanceof IBodyListProvider provider)
+            return DragonBodies.staticBodies.get(provider.getBodies().get((int)(Math.random() * provider.getBodies().size())));
+        return DragonBodies.getStatic(DragonBodies.ORDER[(int)(Math.random() * DragonBodies.ORDER.length)]);
+    }
+
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;setType(Lby/dragonsurvivalteam/dragonsurvival/common/dragon_types/AbstractDragonType;)V"))
+    private void validateBodies(DragonStateHandler instance, AbstractDragonType type, Operation<Void> original) {
+        original.call(instance, type);
+        if (type instanceof IBodyListProvider provider) {
+            if (instance.getBody() == null || !provider.getBodies().contains(instance.getBody().getBodyName()))
+                instance.setBody(DragonBodies.staticBodies.get(provider.getBodies().get(0)));
+            return;
+        }
+        if (instance.getBody() == null || !List.of(DragonBodies.ORDER).contains(instance.getBody().getBodyName().toUpperCase(Locale.ENGLISH)))
+            instance.setBody(DragonBodies.CENTER);
     }
 }

@@ -50,7 +50,7 @@ import java.util.Optional;
 
 public class DragonbornContainer extends AbstractContainerMenu {
     private static final EquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
-    private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[]{InventoryMenu.EMPTY_ARMOR_SLOT_HELMET, InventoryMenu.EMPTY_ARMOR_SLOT_CHESTPLATE, InventoryMenu.EMPTY_ARMOR_SLOT_LEGGINGS, InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS};
+    private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[]{InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS, InventoryMenu.EMPTY_ARMOR_SLOT_LEGGINGS, InventoryMenu.EMPTY_ARMOR_SLOT_CHESTPLATE, InventoryMenu.EMPTY_ARMOR_SLOT_HELMET};
     public final CraftingContainer craftMatrix = new TransientCraftingContainer(this, 2, 2);
     public final ResultContainer craftResult = new ResultContainer();
     public final Player player;
@@ -61,19 +61,19 @@ public class DragonbornContainer extends AbstractContainerMenu {
         this.player = inventory.player;
         this.playerInventory = inventory;
         // Crafting result
-        this.addSlot(new ResultSlot(inventory.player, this.craftMatrix, this.craftResult, 0, 178, 44));
+        this.addSlot(new ResultSlot(inventory.player, this.craftMatrix, this.craftResult, 0, 178, 33));
         addCraftingSlots();
         addArmorSlots(inventory);
         addInventorySlots(inventory);
         addHotbarSlots(inventory);
         // Offhand
-        this.addSlot(new Slot(inventory, 40, 178, 142));
+        this.addSlot(new Slot(inventory, 40, 26, 62));
 
         this.broadcastChanges();
     }
 
     private void addArmorSlots(Inventory inventory) {
-        for(int i = 0; i < 4; ++i) {
+        for (int i = 0; i < 4; i++) {
             final EquipmentSlot equipmentSlot = VALID_EQUIPMENT_SLOTS[i];
             this.addSlot(new Slot(inventory, 39 - i, 8, 8 + i * 18) {
                 public boolean mayPlace(@NotNull ItemStack itemStack) {
@@ -94,25 +94,20 @@ public class DragonbornContainer extends AbstractContainerMenu {
     }
 
     private void addHotbarSlots(Inventory inventory) {
-        for(int i = 0; i < 9; ++i) {
+        for (int i = 0; i < 9; i++)
             this.addSlot(new Slot(inventory, i, 8 + i * 18, 142));
-        }
     }
 
     private void addInventorySlots(Inventory inventory) {
-        for(int column = 0; column < 3; ++column) {
-            for(int row = 0; row < 9; ++row) {
+        for (int column = 0; column < 3; column++)
+            for (int row = 0; row < 9; row++)
                 this.addSlot(new Slot(inventory, row + column * 9 + 9, 8 + row * 18, 84 + column * 18));
-            }
-        }
     }
 
     private void addCraftingSlots() {
-        for(int row = 0; row < 2; ++row) {
-            for(int column = 0; column < 2; ++column) {
-                this.addSlot(new Slot(this.craftMatrix, column + row * 2, 125 + column * 18, 35 + row * 18));
-            }
-        }
+        for (int row = 0; row < 2; row++)
+            for (int column = 0; column < 2; column++)
+                this.addSlot(new Slot(this.craftMatrix, column + row * 2, 120 + column * 18, 24 + row * 18));
     }
 
     public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {

@@ -34,6 +34,6 @@ import org.spongepowered.asm.mixin.injection.At;
 public class LivingEntityRendererMixin {
     @ModifyExpressionValue(method = "setupRotations", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isAutoSpinAttack()Z"))
     private boolean spin(boolean original, @Local(argsOnly = true) LivingEntity entity) {
-        return original || (entity instanceof Player player && DragonbornUtils.isDragonborn(player) && ServerFlightHandler.isGliding(player));
+        return original || (entity instanceof Player player && DragonbornUtils.isDragonborn(player) && ServerFlightHandler.isSpin(player));
     }
 }

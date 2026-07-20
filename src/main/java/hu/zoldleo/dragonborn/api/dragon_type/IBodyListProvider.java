@@ -1,5 +1,7 @@
 package hu.zoldleo.dragonborn.api.dragon_type;
 
+import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonBody;
+
 import java.util.List;
 
 /**
@@ -9,7 +11,7 @@ import java.util.List;
  */
 public interface IBodyListProvider {
     /**
-     * Should return at least one body.
+     * Should return at least one body. The strings should match {@link AbstractDragonBody#getBodyName()}
      */
     List<String> getBodies();
 }

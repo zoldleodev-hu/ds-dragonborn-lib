@@ -24,6 +24,7 @@ import by.dragonsurvivalteam.dragonsurvival.client.gui.settings.ConfigSideSelect
 import by.dragonsurvivalteam.dragonsurvival.client.gui.widgets.buttons.TabButton;
 import by.dragonsurvivalteam.dragonsurvival.client.gui.widgets.buttons.generic.DSImageButton;
 import by.dragonsurvivalteam.dragonsurvival.client.handlers.ClientEvents;
+import by.dragonsurvivalteam.dragonsurvival.client.util.RenderingUtils;
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
 import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonType;
 import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.DragonTypes;
@@ -40,19 +41,21 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.HashMap;
 
 public class DragonbornInventoryScreen extends EffectRenderingInventoryScreen<DragonbornContainer> {
     public static final ResourceLocation INVENTORY_TOGGLE_BUTTON = new ResourceLocation("dragonsurvival", "textures/gui/inventory_button.png");
     public static final ResourceLocation SORTING_BUTTON = new ResourceLocation("dragonsurvival", "textures/gui/sorting_button.png");
     public static final ResourceLocation SETTINGS_BUTTON = new ResourceLocation("dragonsurvival", "textures/gui/settings_button.png");
-    static final ResourceLocation BACKGROUND = new ResourceLocation("dragonsurvival", "textures/gui/inventory/dragon_inventory_alt.png");
+    static final ResourceLocation BACKGROUND = new ResourceLocation("dragonsurvival", "textures/gui/dragonborn_inventory.png");
     private final Player player;
     private boolean buttonClicked;
     private boolean isGrowthIconHovered;
@@ -108,8 +111,8 @@ public class DragonbornInventoryScreen extends EffectRenderingInventoryScreen<Dr
             }, Component.translatable("ds.gui.toggle_inventory.vanilla")));
         }
 
-        this.addRenderableWidget(new DSImageButton(this.leftPos + this.imageWidth - 28, this.height / 2 - 1, 20, 18, 0, 0, 18, SORTING_BUTTON, (p_onPress_1_) -> NetworkHandler.CHANNEL.sendToServer(new SortInventoryPacket()), new Component[]{Component.translatable("ds.gui.sort")}));
-        this.addRenderableWidget(new DSImageButton(this.leftPos + this.imageWidth - 28, this.height / 2 + 35, 20, 18, 0, 0, 18, SETTINGS_BUTTON, (p_onPress_1_) -> Minecraft.getInstance().setScreen(new ConfigSideSelectionScreen(this, Minecraft.getInstance().options, Component.translatable("ds.gui.tab_button.4"))), new Component[]{Component.translatable("ds.gui.tab_button.4")}));
+        this.addRenderableWidget(new DSImageButton(this.leftPos + this.imageWidth - 28, this.height / 2 - 1, 20, 18, 0, 0, 18, SORTING_BUTTON, (p_onPress_1_) -> NetworkHandler.CHANNEL.sendToServer(new SortInventoryPacket()), Component.translatable("ds.gui.sort")));
+        this.addRenderableWidget(new DSImageButton(this.leftPos + this.imageWidth - 28, this.height / 2 + 35, 20, 18, 0, 0, 18, SETTINGS_BUTTON, (p_onPress_1_) -> Minecraft.getInstance().setScreen(new ConfigSideSelectionScreen(this, Minecraft.getInstance().options, Component.translatable("ds.gui.tab_button.4"))), Component.translatable("ds.gui.tab_button.4")));
 
     }
 
@@ -128,6 +131,40 @@ public class DragonbornInventoryScreen extends EffectRenderingInventoryScreen<Dr
         int scissorX0 = leftPos + 65;
         int scissorY0 = topPos + 75 + (int)(renderedSize * 1.25);
         InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, scissorX0, scissorY0, (int)renderedSize + 15, scissorX1, scissorY1, player);
+
+        if (textures == null || textures.isEmpty())
+            initResources();
+
+        double curSize = handler.getSize();
+        float progress = 0.0F;
+        if (handler.getLevel() == DragonLevel.NEWBORN) {
+            progress = (float)((curSize - (double)DragonLevel.NEWBORN.size) / (double)(DragonLevel.YOUNG.size - DragonLevel.NEWBORN.size));
+        } else if (handler.getLevel() == DragonLevel.YOUNG) {
+            progress = (float)((curSize - (double)DragonLevel.YOUNG.size) / (double)(DragonLevel.ADULT.size - DragonLevel.YOUNG.size));
+        } else if (handler.getLevel() == DragonLevel.ADULT && handler.getSize() < 40.0) {
+            progress = (float)((curSize - (double)DragonLevel.ADULT.size) / (double)(40 - DragonLevel.ADULT.size));
+        } else if (handler.getLevel() == DragonLevel.ADULT && handler.getSize() >= (double)40.0F) {
+            progress = (float)((curSize - 40.0) / (ServerConfig.maxGrowthSize - 40.0));
+        }
+
+        int size = 34;
+        int thickness = 5;
+        int circleX = this.leftPos - 58;
+        int circleY = this.topPos - 40;
+        int sides = 6;
+        int radius = size / 2;
+        Color c = new Color(99, 99, 99);
+        RenderSystem.setShaderColor(c.brighter().getRed() / 255.0F, c.brighter().getBlue() / 255.0F, c.brighter().getGreen() / 255.0F, 1.0F);
+        RenderingUtils.drawSmoothCircle(guiGraphics, circleX + radius, circleY + radius, radius, sides, 1.0F, 0.0F);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, textures.get(createTextureKey(handler.getType(), "circle", "")));
+        RenderingUtils.drawTexturedCircle(guiGraphics, circleX + radius, circleY + radius, radius, 0.5F, 0.5F, 0.5F, sides, progress, -0.5F);
+        RenderSystem.setShaderColor(c.getRed() / 255.0F, c.getBlue() / 255.0F, c.getGreen() / 255.0F, 1.0F);
+        RenderingUtils.drawSmoothCircle(guiGraphics, circleX + radius, circleY + radius, radius - thickness, sides, 1.0F, 0.0F);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        guiGraphics.blit(textures.get(createTextureKey(handler.getType(), "growth", "_" + (handler.getLevel().ordinal() + 1))), circleX + 6, circleY + 6, 150, 0.0F, 0.0F, 20, 20, 20, 20);
     }
 
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {

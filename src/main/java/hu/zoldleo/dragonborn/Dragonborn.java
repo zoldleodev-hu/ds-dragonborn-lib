@@ -29,10 +29,14 @@ import net.minecraftforge.fml.common.Mod;
 @Mod(Dragonborn.MODID)
 public class Dragonborn {
     public static final String MODID = "dragonborn_lib";
+
+    // Test
+    public static TestCaveDragonbornType TEST_TYPE;
+
     public Dragonborn() {
         //TODO
         //region Test
-        DragonTypes.registerType(TestCaveDragonbornType::new);
+        TEST_TYPE = DragonTypes.registerType(TestCaveDragonbornType::new);
         DragonBodies.registerType(TestDragonbornBody::new);
         //endregion
     }
