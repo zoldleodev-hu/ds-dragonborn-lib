@@ -123,7 +123,7 @@ configurations {
 dependencies {
     //implementation "net.neoforged:neoforge:${neo_version}"
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
-    implementation "curse.maven:dragons-survival-420799:8423236"
+    implementation "curse.maven:dragons-survival-420799:8513347"
     compileOnly(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.7-beta.1"))
     implementation(jarJar("com.github.bawnorton.mixinsquared:mixinsquared-neoforge:0.3.7-beta.1"))
     // Example optional mod dependency with JEI
