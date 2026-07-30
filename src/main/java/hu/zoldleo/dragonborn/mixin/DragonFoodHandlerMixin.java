@@ -20,12 +20,18 @@
 
 package hu.zoldleo.dragonborn.mixin;
 
+import by.dragonsurvivalteam.dragonsurvival.DragonSurvivalMod;
+import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
 import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonType;
 import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.DragonTypes;
 import by.dragonsurvivalteam.dragonsurvival.common.handlers.DragonFoodHandler;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import hu.zoldleo.dragonborn.api.dragon_type.IDietProvider;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
@@ -90,5 +96,13 @@ public class DragonFoodHandlerMixin {
     @ModifyArg(method = "buildDragonFoodMap", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;of([Ljava/lang/Object;)Ljava/util/stream/Stream;"))
     private static Object[] getFoodListFromProvider(Object[] values, @Local(argsOnly = true) AbstractDragonType type) {
         return type instanceof IDietProvider provider ? provider.getDietConfig().toArray() : values;
+    }
+
+    @WrapOperation(method = "renderFoodBar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIIIII)V"))
+    private static void renderCustomFoodIcons(GuiGraphics instance, ResourceLocation texture, int x, int y, int u, int v, int du, int dv, Operation<Void> original, @Local(name = "handler") DragonStateHandler handler, @Local(name = "type") int type) {
+        if (type == 18 && !DragonbornUtils.isDragonType(handler, DragonTypes.SEA))
+            instance.blit(DragonSurvivalMod.res("textures/gui/custom/food_icons/" + handler.getTypeNameLowerCase() + "_food_icons.png"), x, y, u, 0, du, dv);
+        else
+            original.call(instance, texture, x, y, u, v, du, dv);
     }
 }

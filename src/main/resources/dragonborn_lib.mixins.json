@@ -18,17 +18,19 @@
     "RequestOpenDragonInventoryMixin",
     "SortingHandlerMixin",
     "SyncCompleteMixin",
-    "SynchronizeDragonCapMixin",
-    "client.DragonGlowLayerRendererMixin"
+    "SynchronizeDragonCapMixin"
   ],
   "client": [
     "client.AltarTypeButtonMixin",
+    "client.ClientCastingHandlerMixin",
     "client.ClientDragonRendererMixin",
     "client.ClientFlightHandlerMixin",
+    "client.ClientMagicHUDHandlerMixin",
     "client.DragonAltarGUIMixin",
     "client.DragonBodyButtonMixin",
     "client.DragonEditorHandlerMixin",
     "client.DragonEditorScreenMixin",
+    "client.DragonGlowLayerRendererMixin",
     "client.DragonModelMixin",
     "client.DragonRendererMixin",
     "client.DragonScreenMixin",

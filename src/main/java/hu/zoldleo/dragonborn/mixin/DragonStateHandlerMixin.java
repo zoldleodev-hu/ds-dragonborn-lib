@@ -21,18 +21,31 @@
 package hu.zoldleo.dragonborn.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
+import by.dragonsurvivalteam.dragonsurvival.common.capability.subcapabilities.MagicCap;
 import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.AbstractDragonType;
+import by.dragonsurvivalteam.dragonsurvival.magic.common.innate.DragonWingAbility;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import javax.annotation.Nullable;
+
 @Mixin(value = DragonStateHandler.class, remap = false)
-public class DragonStateHandlerMixin {
+public abstract class DragonStateHandlerMixin {
+    @Shadow
+    @Nullable
+    public abstract AbstractDragonType getType();
+
+    @Shadow
+    public abstract MagicCap getMagicData();
+
     @Unique
     @SuppressWarnings("unused")
     public String dragonborn$fakeSkinModelName;
@@ -46,5 +59,11 @@ public class DragonStateHandlerMixin {
     private void reinsertClawToolsForDragonborn(AbstractDragonType type, Player player, CallbackInfo ci) {
         if (DragonbornUtils.isSpeciesDragonborn(type))
             DragonbornUtils.reInsertClawTools(player);
+    }
+
+    @Inject(method = "setHasFlight", at = @At(value = "FIELD", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;hasFlight:Z", opcode = Opcodes.PUTFIELD), cancellable = true)
+    private void checkWings(boolean hasFlight, CallbackInfo ci) {
+        if (getMagicData().abilities.values().stream().noneMatch(x -> x instanceof DragonWingAbility && x.getDragonType().equals(getType())))
+            ci.cancel();
     }
 }
