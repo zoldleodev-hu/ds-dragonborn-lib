@@ -20,24 +20,13 @@
 
 package hu.zoldleo.dragonborn;
 
-import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.DragonBodies;
-import by.dragonsurvivalteam.dragonsurvival.common.dragon_types.DragonTypes;
-import hu.zoldleo.dragonborn.common.test.TestCaveDragonbornType;
-import hu.zoldleo.dragonborn.common.test.TestDragonbornBody;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod(Dragonborn.MODID)
 public class Dragonborn {
     public static final String MODID = "dragonborn_lib";
 
-    // Test
-    public static TestCaveDragonbornType TEST_TYPE;
-
     public Dragonborn() {
-        //TODO
-        //region Test
-        TEST_TYPE = DragonTypes.registerType(TestCaveDragonbornType::new);
-        DragonBodies.registerType(TestDragonbornBody::new);
-        //endregion
+
     }
 }

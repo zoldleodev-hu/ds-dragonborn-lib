@@ -1,5 +1,5 @@
 {
-  "required": false,
+  "required": true,
   "package": "hu.zoldleo.dragonborn.mixin",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
@@ -23,6 +23,7 @@
     "client.DragonAltarGUIMixin",
     "client.DragonBodyButtonMixin",
     "client.DragonEditorHandlerMixin",
+    "client.DragonEditorRegistryMixin",
     "client.DragonEditorScreenMixin",
     "client.DragonGlowLayerRendererMixin",
     "client.DragonModelMixin",

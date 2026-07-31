@@ -30,7 +30,6 @@ import com.mojang.blaze3d.platform.NativeImage;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.entity.player.Player;
@@ -38,41 +37,39 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-@SuppressWarnings("all")
 @Mixin(value = DragonEditorHandler.class, remap = false)
 public class DragonEditorHandlerMixin {
-    @ModifyVariable(method = "genTextures", at = @At(value = "STORE", ordinal = 1))
-    private static NativeImage addPlayerTexture(NativeImage original, @Local(argsOnly = true) Player player, @Local(argsOnly = true) DragonStateHandler handler) throws NoSuchFieldException, IllegalAccessException {
+    @ModifyVariable(method = "genTextures", at = @At(value = "STORE", ordinal = 0), name = "normal")
+    private static NativeImage addPlayerTexture(NativeImage normal, @Local(argsOnly = true) Player player, @Local(argsOnly = true) DragonStateHandler handler) throws NoSuchFieldException, IllegalAccessException {
         if (player instanceof FakeClientPlayer fake)
             handler = fake.handler;
 
         if (DragonbornUtils.isDragonborn(handler) && player instanceof AbstractClientPlayer clientPlayer) {
             ResourceLocation fakeSkin = (ResourceLocation)handler.getClass().getField("dragonborn$fakeSkinTexture").get(handler);
             ResourceLocation skin = (fakeSkin == null) ? clientPlayer.getSkinTextureLocation() : fakeSkin;
-            AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(skin);
 
-            if (handler == DragonEditorScreen.handler)
-                texture = Minecraft.getInstance().getTextureManager().getTexture(Minecraft.getInstance().player.getSkinTextureLocation());
+            if (handler == DragonEditorScreen.handler && Minecraft.getInstance().player != null)
+                skin = Minecraft.getInstance().player.getSkinTextureLocation();
 
             try {
                 Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(skin);
                 if (resource.isEmpty())
                     throw new IOException(String.format("Resource %s not found!", skin.getPath()));
 
-                InputStream textureStream = ((Resource)resource.get()).open();
+                InputStream textureStream = resource.get().open();
                 NativeImage tempColorPicker = NativeImage.read(textureStream);
                 textureStream.close();
 
-                for(int x = 0; x < tempColorPicker.getWidth(); ++x) {
-                    for(int y = 0; y < tempColorPicker.getHeight(); ++y) {
+                for (int x = 0; x < tempColorPicker.getWidth(); x++) {
+                    for (int y = 0; y < tempColorPicker.getHeight(); y++) {
                         Color color = new Color(tempColorPicker.getPixelRGBA(x, y), true);
                         if (color.getAlpha() != 0)
-                            original.setPixelRGBA(x, y, color.getRGB());
+                            normal.setPixelRGBA(x, y + 448, color.getRGB());
                     }
                 }
 
@@ -81,6 +78,6 @@ public class DragonEditorHandlerMixin {
                 DragonSurvivalMod.LOGGER.error("An error occured while compiling the dragon skin texture", e);
             }
         }
-        return original;
+        return normal;
     }
 }
