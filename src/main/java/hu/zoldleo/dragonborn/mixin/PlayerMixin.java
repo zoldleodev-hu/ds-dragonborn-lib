@@ -32,13 +32,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = Player.class, priority = 1500, remap = false)
 public abstract class PlayerMixin {
-    // Might be unused
-    /*/@TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.MixinPlayerEntity", name = "dragonSurvival$checkDragonHitbox")
-    @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean excludeDragonborn(Entity player, Operation<Boolean> original) {
-        return original.call(player) && !DragonbornUtils.isDragonDragonborn(player);
-    }*/
-
     @ModifyExpressionValue(method = "updatePlayerPose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isAutoSpinAttack()Z"))
     private boolean spin(boolean original) {
         Player player = (Player)(Object)this;

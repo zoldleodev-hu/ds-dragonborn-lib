@@ -42,16 +42,6 @@ import java.util.Optional;
 
 @Mixin(value = DragonRenderer.class, remap = false)
 public class DragonRendererMixin {
-    /*/@Inject(method = "getModelOffset", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/MovementData;getData(Lnet/minecraft/world/entity/Entity;)Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/MovementData;"), cancellable = true)
-    private void noOffset(DragonEntity dragon, float partialTicks, CallbackInfoReturnable<Vec3> cir, @Local(name = "player") Player player) {
-        DragonStateHandler handler = player.getData(DSDataAttachments.DRAGON_HANDLER);
-        if (player instanceof FakeClientPlayer fake)
-            handler = fake.handler;
-        if (DragonbornUtils.isDragonborn(handler)) {
-            cir.setReturnValue(Vec3.ZERO);
-        }
-    }*/
-
     @Inject(method = "preRender(Lcom/mojang/blaze3d/vertex/PoseStack;Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;Lsoftware/bernie/geckolib/cache/object/BakedGeoModel;Lnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZFIIFFFF)V", at = @At("HEAD"))
     private void dragonbornAttachmentPoints(PoseStack poseStack, DragonEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha, CallbackInfo ci) {
         if (animatable.getPlayer() instanceof AbstractClientPlayer player && DragonbornUtils.isDragonborn(player)) {
@@ -67,12 +57,6 @@ public class DragonRendererMixin {
             }
         }
     }
-
-    /*@Inject(method = "setupRender", at = @At("HEAD"), cancellable = true)
-    private void dontTranslateDragonborn(DragonEntity dragon, Player player, PoseStack pose, float partialTick, CallbackInfo ci) {
-        if (DragonbornUtils.isDragonborn(player))
-            ci.cancel();
-    }*/
 
     @Unique
     private void dragonborn$copyTRSData(ModelPart root, GeoBone bone) {

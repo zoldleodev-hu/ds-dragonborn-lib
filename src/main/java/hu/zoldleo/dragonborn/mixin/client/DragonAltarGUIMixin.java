@@ -34,7 +34,6 @@ import by.dragonsurvivalteam.dragonsurvival.util.DragonUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.systems.RenderSystem;
-//import hu.zoldleo.dragonborn.common.datadriven.DataDrivenDragonType;
 import hu.zoldleo.dragonborn.api.dragon_type.IBodyListProvider;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;
@@ -61,23 +60,6 @@ import java.util.function.Supplier;
 
 @Mixin(value = DragonAltarGUI.class, remap = false)
 public class DragonAltarGUIMixin extends Screen {
-    /*/@Shadow
-    public DragonStateHandler handler2;
-
-    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Ljava/lang/Math;clamp(JII)I", ordinal = 0))
-    private int entity1Scale(int original) {
-        if (DragonbornUtils.isDragonborn(handler1))
-            return 40;
-        return original;
-    }
-
-    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Ljava/lang/Math;clamp(JII)I", ordinal = 1))
-    private int entity2Scale(int original) {
-        if (DragonbornUtils.isDragonborn(handler2))
-            return 40;
-        return original;
-    }*/
-
     @Shadow
     private boolean hasInit;
     @Shadow
@@ -105,9 +87,6 @@ public class DragonAltarGUIMixin extends Screen {
                 !(DragonbornUtils.isDragonType(x, DragonTypes.CAVE) ||
                 DragonbornUtils.isDragonType(x, DragonTypes.FOREST) ||
                 DragonbornUtils.isDragonType(x, DragonTypes.SEA))).toList());
-        /*/for (String type : DragonTypes.staticTypes.keySet().stream().sorted().toList())
-            dragonborn$types.add(DragonTypes.getStatic(type));
-        dragonborn$types.addAll(DataDrivenDragonType.getRegisteredDragonTypes());*/
         dragonborn$types.add(null);
 
         DragonAltarGUI self = (DragonAltarGUI)(Object)this;

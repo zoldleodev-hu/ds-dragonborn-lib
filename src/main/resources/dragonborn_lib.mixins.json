@@ -5,20 +5,14 @@
   "minVersion": "0.8",
   "refmap": "dragonborn_lib.refmap.json",
   "mixins": [
-    "DragonCommandMixin",
     "DragonFoodHandlerMixin",
     "DragonSizeHandlerMixin",
-    "DragonStateHandlerAccessor",
     "DragonStateHandlerMixin",
-    "DragonTypesMixin",
     "LivingEntityMixin",
-    "MagicHandlerMixin",
-    "PlayerAccessor",
     "PlayerMixin",
     "RequestOpenDragonInventoryMixin",
     "SortingHandlerMixin",
-    "SyncCompleteMixin",
-    "SynchronizeDragonCapMixin"
+    "SyncCompleteMixin"
   ],
   "client": [
     "client.AltarTypeButtonMixin",
@@ -39,6 +33,7 @@
     "client.LevelRendererMixin",
     "client.LivingEntityRendererMixin",
     "client.MagicHUDMixin",
-    "client.PlayerRendererMixin"
+    "client.PlayerRendererMixin",
+    "client.ToolTipHandlerMixin"
   ]
 }

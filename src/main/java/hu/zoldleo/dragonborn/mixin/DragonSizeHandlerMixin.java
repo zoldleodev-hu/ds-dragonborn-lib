@@ -51,23 +51,10 @@ public abstract class DragonSizeHandlerMixin {
         return original && !DragonbornUtils.isDragonborn(handler);
     }
 
-    /*/@Inject(method = "calculateDimensions", at = @At("HEAD"), cancellable = true)
-    private static void injectPlayerDim(DragonStateHandler handler, Player player, Pose overridePose, CallbackInfoReturnable<EntityDimensions> cir) {
-        if (DragonbornUtils.isDragonborn(player)) {
-            cir.setReturnValue(player.getDimensions(player.getPose()));
-        }
-    }*/
-
     @WrapOperation(method = "canPoseFit", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/handlers/DragonSizeHandler;calculateDimensions(DD)Lnet/minecraft/world/entity/EntityDimensions;"))
     private static EntityDimensions dragonbornDimensions(double width, double height, Operation<EntityDimensions> original, @Local(argsOnly = true) LivingEntity player) {
         if (DragonbornUtils.isDragonborn(player))
             return player.getDimensions(player.getPose());
         return original.call(width, height);
     }
-
-    /*/@Inject(method = "fudgePositionAfterSizeChange", at = @At("HEAD"), cancellable = true)
-    private static void excludePassengerDragonborn(Entity entity, EntityDimensions currentDimension, EntityDimensions newDimensions, CallbackInfo ci) {
-        if (DragonbornUtils.isDragonborn(entity) && entity.isPassenger())
-            ci.cancel();
-    }*/
 }

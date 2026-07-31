@@ -12,11 +12,6 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 @Mixin(value = DragonGlowLayerRenderer.class, remap = false)
 public class DragonGlowLayerRendererMixin {
-    /*/@ModifyExpressionValue(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;Lsoftware/bernie/geckolib/cache/object/BakedGeoModel;Lnet/minecraft/client/renderer/RenderType;Lnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/VertexConsumer;FII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/ResourceLocation;equals(Ljava/lang/Object;)Z"))
-    private boolean useCustomSkin(boolean original, @Local(name = "handler") DragonStateHandler handler) {
-        return original || handler.getBody().is(Dragonborn.CAN_USE_CUSTOM_SKIN);
-    }*/
-
     @ModifyExpressionValue(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;Lsoftware/bernie/geckolib/cache/object/BakedGeoModel;Lnet/minecraft/client/renderer/RenderType;Lnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/VertexConsumer;FII)V", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;getTypeNameLowerCase()Ljava/lang/String;"))
     private String getCustomTypeName(String original) {
         return new ResourceLocation(original).getPath();

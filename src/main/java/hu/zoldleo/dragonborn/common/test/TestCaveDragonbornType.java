@@ -7,6 +7,8 @@ import by.dragonsurvivalteam.dragonsurvival.config.obj.ConfigType;
 import hu.zoldleo.dragonborn.api.dragon_type.IBodyListProvider;
 import hu.zoldleo.dragonborn.api.dragon_type.IDietProvider;
 import hu.zoldleo.dragonborn.api.dragon_type.IDragonborn;
+import hu.zoldleo.dragonborn.api.dragon_type.IFoodTooltipProvider;
+import net.minecraft.ChatFormatting;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -14,7 +16,7 @@ import net.minecraft.world.level.block.Block;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestCaveDragonbornType extends CaveDragonType implements IDragonborn, IDietProvider, IBodyListProvider {
+public class TestCaveDragonbornType extends CaveDragonType implements IDragonborn, IDietProvider, IBodyListProvider, IFoodTooltipProvider {
     @ConfigType(Item.class)
     @ConfigOption(
             side = ConfigSide.SERVER,
@@ -47,5 +49,20 @@ public class TestCaveDragonbornType extends CaveDragonType implements IDragonbor
     @Override
     public List<String> getBodies() {
         return List.of("dragonborn");
+    }
+
+    @Override
+    public ChatFormatting foodTooltipColor() {
+        return ChatFormatting.LIGHT_PURPLE;
+    }
+
+    @Override
+    public String nutritionIcon() {
+        return "\uea02";
+    }
+
+    @Override
+    public String saturationIcon() {
+        return "\uea05";
     }
 }

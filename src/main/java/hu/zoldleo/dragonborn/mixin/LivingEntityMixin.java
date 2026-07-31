@@ -33,9 +33,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = LivingEntity.class, remap = false)
 public abstract class LivingEntityMixin {
-    /*@Shadow
-    protected abstract boolean isImmobile();*/
-
     @ModifyReturnValue(method = "isFallFlying", at = @At("RETURN"))
     private boolean spinOrGlide(boolean original) throws NoSuchFieldException, IllegalAccessException {
         if ((LivingEntity)(Object)this instanceof Player player) {
@@ -45,16 +42,6 @@ public abstract class LivingEntityMixin {
         }
         return original;
     }
-
-    /*/@SuppressWarnings("all")
-    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isImmobile()Z"))
-    private void rotateHead(CallbackInfo ci) {
-        if ((Object)this instanceof Player player && DragonbornUtils.isDragonborn(player) && isImmobile()) {
-            MagicCap data = DragonbornUtils.getHandler(player).getMagicData();
-            if (data.getCurrentlyCasting() != null && !data.getCurrentlyCasting().value().activation().canMoveWhileCasting())
-                player.yHeadRot = player.getYRot();
-        }
-    }*/
 
     @SuppressWarnings("all")
     @Inject(method = "getBedOrientation", at = @At("HEAD"), cancellable = true)
