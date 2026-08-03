@@ -27,12 +27,13 @@ import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import javax.annotation.Nullable;
 
 @Mixin(DragonStateHandler.class)
 public class DragonStateHandlerMixin {
@@ -40,7 +41,7 @@ public class DragonStateHandlerMixin {
     @SuppressWarnings("unused")
     public PlayerSkin dragonborn$fakeSkin;
 
-    @SuppressWarnings("all")
+    @SuppressWarnings("DataFlowIssue")
     @Inject(method = "setSpecies(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/Holder;Z)V", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/PenaltySupply;clear(Lnet/minecraft/world/entity/player/Player;)V", ordinal = 0))
     private void reinsertClawToolsForDragonborn(@Nullable Player player, @Nullable Holder<DragonSpecies> species, boolean savedForSoul, CallbackInfo ci) {
         if (DragonbornUtils.isSpeciesDragonborn(species))

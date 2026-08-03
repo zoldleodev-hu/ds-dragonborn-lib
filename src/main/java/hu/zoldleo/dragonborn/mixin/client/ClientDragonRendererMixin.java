@@ -40,7 +40,6 @@ import static by.dragonsurvivalteam.dragonsurvival.client.render.ClientDragonRen
 
 @Mixin(ClientDragonRenderer.class)
 public class ClientDragonRendererMixin {
-    @SuppressWarnings("all")
     @Inject(method = "renderDragon", at = @At(value = "INVOKE_ASSIGN", target = "Lby/dragonsurvivalteam/dragonsurvival/client/render/ClientDragonRenderer;getOrCreateDragon(Lnet/minecraft/world/entity/player/Player;)Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;"), cancellable = true)
     private static void cancelDragonRender(RenderPlayerEvent.Pre event, CallbackInfo ci, @Local(name = "dragon") DragonEntity dragon, @Local(name = "player") AbstractClientPlayer player) {
         if (DragonbornUtils.isDragonDragonborn(player)) {

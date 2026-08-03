@@ -27,7 +27,8 @@ import hu.zoldleo.dragonborn.Dragonborn;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public class DragonbornUtils {
     public static boolean isDragonborn(DragonStateHandler handler) {
@@ -54,7 +55,6 @@ public class DragonbornUtils {
         return isDragonDragonborn(player.getData(DSDataAttachments.DRAGON_HANDLER));
     }
 
-    @SuppressWarnings("all")
     public static boolean isDragonDragonborn(@Nullable Entity entity) {
         return entity instanceof Player player && isDragonDragonborn(player.getData(DSDataAttachments.DRAGON_HANDLER));
     }

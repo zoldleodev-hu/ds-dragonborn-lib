@@ -95,7 +95,7 @@ file="META-INF/accesstransformer.cfg"
 [[dependencies.dragonborn_lib]]
 modId="dragonsurvival"
 type="required"
-versionRange="[2.0.53,)"
+versionRange="[2.0.63,)"
 ordering="AFTER"
 side="BOTH"
 

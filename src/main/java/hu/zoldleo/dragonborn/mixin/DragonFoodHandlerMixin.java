@@ -27,9 +27,10 @@ import com.llamalad7.mixinextras.sugar.Local;
 import hu.zoldleo.dragonborn.Dragonborn;
 import net.minecraft.core.Holder;
 import net.minecraft.world.food.FoodProperties;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+
+import javax.annotation.Nullable;
 
 @Mixin(DragonFoodHandler.class)
 public class DragonFoodHandlerMixin {

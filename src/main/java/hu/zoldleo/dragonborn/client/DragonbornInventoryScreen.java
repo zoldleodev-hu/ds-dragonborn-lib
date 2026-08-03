@@ -54,8 +54,8 @@ import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforgespi.language.IModInfo;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 
@@ -138,7 +138,7 @@ public class DragonbornInventoryScreen extends EffectRenderingInventoryScreen<Dr
         this.addRenderableWidget(sortInventoryButton);
     }
 
-    private @NotNull HoverButton getHoverButton() {
+    private @Nonnull HoverButton getHoverButton() {
         HoverButton configButton = new HoverButton(leftPos + 177, topPos + 102, 18, 16, 18, 18, CONFIG_MAIN, CONFIG_HOVER, (button) -> {
             Minecraft minecraft = Minecraft.getInstance();
             Optional<Screen> configScreen = ModList.get().getModContainerById("dragonsurvival").flatMap((m) -> {
@@ -154,11 +154,11 @@ public class DragonbornInventoryScreen extends EffectRenderingInventoryScreen<Dr
         return configButton;
     }
 
-    protected void renderLabels(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void renderLabels(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY) {
     }
 
     @Override
-    protected void renderBg(@NotNull GuiGraphics guiGraphics, float v, int mouseX, int mouseY) {
+    protected void renderBg(@Nonnull GuiGraphics guiGraphics, float v, int mouseX, int mouseY) {
         RenderSystem.enableBlend();
         guiGraphics.blit(BACKGROUND, leftPos, topPos, 0, 0, imageWidth, imageHeight);
         RenderSystem.disableBlend();
@@ -171,7 +171,7 @@ public class DragonbornInventoryScreen extends EffectRenderingInventoryScreen<Dr
         InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, scissorX0, scissorY0, scissorX1, scissorY1, scale, 0.0F, (float)mouseX, (float)mouseY, player);
     }
 
-    public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(@Nonnull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
         this.renderTooltip(graphics, mouseX, mouseY);
         this.growthButton.renderTooltip(graphics, mouseX, mouseY);

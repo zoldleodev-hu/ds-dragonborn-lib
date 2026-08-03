@@ -33,7 +33,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
@@ -90,7 +89,7 @@ public class DragonbornContainer extends AbstractContainerMenu {
         }
     }
 
-    public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
+    public @Nonnull ItemStack quickMoveStack(@Nonnull Player player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = slots.get(index);
         if (slot.hasItem()) {
@@ -155,12 +154,12 @@ public class DragonbornContainer extends AbstractContainerMenu {
         return slot.container != craftResult && super.canTakeItemForPickAll(itemStack, slot);
     }
 
-    public void removed(@NotNull Player player) {
+    public void removed(@Nonnull Player player) {
         super.removed(player);
         clearContainer(player, craftMatrix);
     }
 
-    public void slotsChanged(@NotNull Container inventory) {
+    public void slotsChanged(@Nonnull Container inventory) {
         if (player instanceof ServerPlayer serverPlayer) {
             ItemStack itemStack = ItemStack.EMPTY;
             Optional<RecipeHolder<CraftingRecipe>> recipeOptional = serverPlayer.serverLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), serverPlayer.level());
@@ -178,7 +177,7 @@ public class DragonbornContainer extends AbstractContainerMenu {
 
     }
 
-    public boolean stillValid(@NotNull Player ignored) {
+    public boolean stillValid(@Nonnull Player ignored) {
         return true;
     }
 }

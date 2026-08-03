@@ -50,20 +50,18 @@ public abstract class LivingEntityMixin {
         return original;
     }
 
-    @SuppressWarnings("all")
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isImmobile()Z"))
     private void rotateHead(CallbackInfo ci) {
-        if ((Object)this instanceof Player player && DragonbornUtils.isDragonborn(player) && isImmobile()) {
+        if ((LivingEntity)(Object)this instanceof Player player && DragonbornUtils.isDragonborn(player) && isImmobile()) {
             MagicData data = MagicData.getData(player);
             if (data.getCurrentlyCasting() != null && !data.getCurrentlyCasting().value().activation().canMoveWhileCasting())
                 player.yHeadRot = player.getYRot();
         }
     }
 
-    @SuppressWarnings("all")
     @Inject(method = "getBedOrientation", at = @At("HEAD"), cancellable = true)
     private void swapBedOrientation(CallbackInfoReturnable<Direction> cir) {
-        if ((Object)this instanceof Player player && DragonbornUtils.isDragonborn(player) && TreasureRestData.getData(player).isResting())
+        if ((LivingEntity)(Object)this instanceof Player player && DragonbornUtils.isDragonborn(player) && TreasureRestData.getData(player).isResting())
             cir.setReturnValue(Direction.getNearest(player.calculateViewVector(0, ((PlayerAccessor)player).sleepDir())).getOpposite());
     }
 }

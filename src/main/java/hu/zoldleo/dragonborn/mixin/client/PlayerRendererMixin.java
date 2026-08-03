@@ -37,11 +37,12 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import javax.annotation.Nonnull;
 
 @Mixin(PlayerRenderer.class)
 public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
@@ -53,7 +54,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
     private void addDragonbornLayer(EntityRendererProvider.Context context, boolean useSlimModel, CallbackInfo ci) {
         addLayer(new RenderLayer<>(this) {
             @Override
-            public void render(@NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int packedLight, @NotNull AbstractClientPlayer player, float v, float v1, float partialTicks, float v3, float v4, float v5) {
+            public void render(@Nonnull PoseStack poseStack,@Nonnull  MultiBufferSource buffer, int packedLight, @Nonnull AbstractClientPlayer player, float v, float v1, float partialTicks, float v3, float v4, float v5) {
                 DragonStateHandler handler = player.getData(DSDataAttachments.DRAGON_HANDLER);
                 if (DragonbornUtils.isDragonborn(handler) && !player.isInvisible()) {
                     poseStack.pushPose();

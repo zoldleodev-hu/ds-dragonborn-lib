@@ -18,15 +18,19 @@ version = mod_version
 group = mod_group_id
 
 repositories {
-    maven {
+    /*maven {
         name = 'GeckoLib'
         url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
         content {
             includeGroup("software.bernie.geckolib")
         }
-    }
+    }*/
     maven { url = "https://maven.bawnorton.com/releases" }
     maven { url = "https://cursemaven.com" }
+    /*maven {
+        name = "Mojang"
+        url = "https://minecraft.net"
+    }*/
     // Add here additional repositories if required by some of the dependencies below.
 }
 
@@ -122,10 +126,12 @@ configurations {
 
 dependencies {
     //implementation "net.neoforged:neoforge:${neo_version}"
-    implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
-    implementation "curse.maven:dragons-survival-420799:8513347"
-    compileOnly(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.7-beta.1"))
-    implementation(jarJar("com.github.bawnorton.mixinsquared:mixinsquared-neoforge:0.3.7-beta.1"))
+    //implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    implementation "curse.maven:geckolib-388172:8350073"
+    implementation "curse.maven:dragons-survival-420799:8564714"
+    compileOnly(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.7-beta.3"))
+    implementation(jarJar("com.github.bawnorton.mixinsquared:mixinsquared-neoforge:0.3.7-beta.3"))
+    //implementation 'com.mojang:datafixers:8.0.16'
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
