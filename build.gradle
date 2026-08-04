@@ -16,7 +16,7 @@ tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
 
-version = minecraft_version + "-" + mod_version
+version = minecraft_version + "-" + mod_version + "-deobf"
 group = mod_group_id
 
 repositories {
@@ -151,7 +151,7 @@ tasks.named('jar', Jar).configure {
         ])
     }
 
-    finalizedBy 'reobfJar'
+    //finalizedBy 'reobfJar'
 }
 
 tasks.named('jarJar', Jar).configure {
@@ -169,7 +169,7 @@ tasks.named('jarJar', Jar).configure {
         ])
     }
 
-    finalizedBy 'reobfJarJar'
+    //finalizedBy 'reobfJarJar'
 }
 
 tasks.register("noArt", Jar) {
