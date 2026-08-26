@@ -43,7 +43,7 @@ public record ShapeshiftAbilityEffect(Holder<ShapeshiftForm> form) implements Ab
     @Override
     public void apply(ServerPlayer player, DragonAbilityInstance ability, Entity target) {
         if (target instanceof Player && target.getData(DSDataAttachments.DRAGON_HANDLER).isDragon()) {
-            if (ShapeshiftForm.isTransformed(player))
+            if (ShapeshiftForm.isTransformed(player) && ShapeshiftForm.getData(player).equals(form))
                 target.removeData(Dragonborn.SHAPESHIFT_DATA);
             else
                 target.setData(Dragonborn.SHAPESHIFT_DATA, form);
