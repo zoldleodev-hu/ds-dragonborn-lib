@@ -40,7 +40,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class DragonSoulItemMixin {
     @Inject(method = "finishUsingItem", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/PenaltySupply;clear(Lnet/minecraft/world/entity/player/Player;)V"))
     private void reinsertItemsFixAndStoreProfile(ItemStack stack, Level level, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir, @Local(name = "player") Player player, @Local(name = "handler") DragonStateHandler handler) {
-        if (DragonbornUtils.isDragonDragonborn(handler))
+        if (DragonbornUtils.noClawSlotsDragon(handler))
             ClawInventoryData.reInsertClawTools(player);
         stack.set(DataComponents.PROFILE, new ResolvableProfile(player.getGameProfile()));
     }

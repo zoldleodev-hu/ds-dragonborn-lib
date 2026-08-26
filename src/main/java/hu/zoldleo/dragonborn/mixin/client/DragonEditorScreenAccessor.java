@@ -18,19 +18,23 @@
 //
 //  zoldleo.dev@gmail.com
 
-package hu.zoldleo.dragonborn.mixin;
+package hu.zoldleo.dragonborn.mixin.client;
 
-import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
-import net.minecraft.world.entity.player.Player;
+import by.dragonsurvivalteam.dragonsurvival.client.gui.screens.dragon_editor.DragonEditorScreen;
+import hu.zoldleo.dragonborn.common.ability.ShapeshiftForm;
+import net.minecraft.core.Holder;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ServerFlightHandler.class)
-public class ServerFlightHandlerMixin {
-    @Inject(method = "handleLanding(Lnet/minecraft/world/entity/player/Player;)V", at = @At("HEAD"))
-    private static void setLanded(Player player, CallbackInfo ci) {
-        ((PlayerAccessor)player).landed(true);
+import javax.annotation.Nullable;
+
+@Mixin(DragonEditorScreen.class)
+public interface DragonEditorScreenAccessor {
+    @Accessor("dragonborn$form")
+    @Dynamic
+    @Nullable
+    static Holder<ShapeshiftForm> getForm() {
+        return null;
     }
 }

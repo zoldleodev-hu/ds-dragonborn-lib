@@ -26,6 +26,7 @@ import com.bawnorton.mixinsquared.TargetHandler;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import hu.zoldleo.dragonborn.common.ability.ShapeshiftForm;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -41,19 +42,19 @@ public abstract class PlayerMixin {
     @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.PlayerMixin", name = "dragonSurvival$checkDragonHitbox")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean excludeDragonborn(Entity entity, Operation<Boolean> original) {
-        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
+        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity) && !ShapeshiftForm.isTransformed((Player) entity);
     }
 
     @ModifyExpressionValue(method = "updatePlayerPose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isAutoSpinAttack()Z"))
     private boolean spin(boolean original) {
         Player player = (Player)(Object)this;
-        return original || (DragonbornUtils.isDragonborn(player) && ServerFlightHandler.isSpin(player));
+        return original || (DragonbornUtils.isDragonborn(player) && !ShapeshiftForm.isTransformed(player) && ServerFlightHandler.isSpin(player));
     }
 
     @ModifyExpressionValue(method = "updatePlayerPose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isFallFlying()Z"))
     private boolean glide(boolean original) {
         Player player = (Player)(Object)this;
-        return original || (DragonbornUtils.isDragonborn(player) && ServerFlightHandler.isGliding(player));
+        return original || (DragonbornUtils.isDragonborn(player) && !ShapeshiftForm.isTransformed(player) && ServerFlightHandler.isGliding(player));
     }
 
     @ModifyExpressionValue(method = "updatePlayerPose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSleeping()Z"))
@@ -65,7 +66,7 @@ public abstract class PlayerMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     private void setBedOrientation(CallbackInfo ci) {
         Player player = (Player)(Object)this;
-        if (DragonbornUtils.isDragonborn(player) && !TreasureRestData.getData(player).isResting())
+        if (DragonbornUtils.isDragonborn(player) && !ShapeshiftForm.isTransformed(player) && !TreasureRestData.getData(player).isResting())
             dragonborn$sleepDir = player.yHeadRot;
     }
 

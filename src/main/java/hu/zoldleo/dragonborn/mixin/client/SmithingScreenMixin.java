@@ -23,9 +23,11 @@ package hu.zoldleo.dragonborn.mixin.client;
 import com.bawnorton.mixinsquared.TargetHandler;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import hu.zoldleo.dragonborn.common.ability.ShapeshiftForm;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.gui.screens.inventory.SmithingScreen;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -34,6 +36,6 @@ public class SmithingScreenMixin {
     @TargetHandler(mixin = "by.dragonsurvivalteam.dragonsurvival.mixins.client.SmithingScreenMixin", name = "dragonSurvival$addDragonToInit")
     @WrapOperation(method = "@MixinSquared:Handler", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateProvider;isDragon(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean excludeDragonborn(Entity entity, Operation<Boolean> original) {
-        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity);
+        return original.call(entity) && !DragonbornUtils.isDragonDragonborn(entity) && !ShapeshiftForm.isTransformed((Player) entity);
     }
 }

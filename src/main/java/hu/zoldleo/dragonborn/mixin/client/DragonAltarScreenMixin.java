@@ -23,6 +23,8 @@ package hu.zoldleo.dragonborn.mixin.client;
 import by.dragonsurvivalteam.dragonsurvival.client.gui.screens.DragonAltarScreen;
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,5 +53,10 @@ public class DragonAltarScreenMixin {
         if (DragonbornUtils.isDragonborn(handler2))
             return 40;
         return original;
+    }
+
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/common/capability/DragonStateHandler;isDragon()Z"))
+    private boolean renderFakeDragonborn(DragonStateHandler instance, Operation<Boolean> original) {
+        return original.call(instance) && !DragonbornUtils.isDragonDragonborn(instance);
     }
 }

@@ -28,6 +28,7 @@ import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachmen
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import hu.zoldleo.dragonborn.common.ability.ShapeshiftForm;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
@@ -51,6 +52,8 @@ import java.util.Optional;
 public class DragonRendererMixin {
     @Inject(method = "getModelOffset", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/MovementData;getData(Lnet/minecraft/world/entity/Entity;)Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/MovementData;"), cancellable = true)
     private void noOffset(DragonEntity dragon, float partialTicks, CallbackInfoReturnable<Vec3> cir, @Local(name = "player") Player player) {
+        if (ShapeshiftForm.isTransformed(player))
+            return;
         DragonStateHandler handler = player.getData(DSDataAttachments.DRAGON_HANDLER);
         if (player instanceof FakeClientPlayer fake)
             handler = fake.handler;
@@ -61,7 +64,7 @@ public class DragonRendererMixin {
 
     @Inject(method = "preRender(Lcom/mojang/blaze3d/vertex/PoseStack;Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;Lsoftware/bernie/geckolib/cache/object/BakedGeoModel;Lnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZFIII)V", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/Optional;orElse(Ljava/lang/Object;)Ljava/lang/Object;"))
     private void dragonbornAttachmentPoints(PoseStack poseStack, DragonEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int color, CallbackInfo ci, @Local(name = "player") Player player) {
-        if (player instanceof AbstractClientPlayer abstractPlayer && DragonbornUtils.isDragonborn(player)) {
+        if (player instanceof AbstractClientPlayer abstractPlayer && DragonbornUtils.isDragonborn(player) && !ShapeshiftForm.isTransformed(player)) {
             Optional<GeoBone> headBone = model.getBone("Head");
             Optional<GeoBone> bodyBone = model.getBone("Body");
             if (headBone.isPresent()) {
@@ -77,7 +80,7 @@ public class DragonRendererMixin {
 
     @Inject(method = "setupRender", at = @At("HEAD"), cancellable = true)
     private void dontTranslateDragonborn(DragonEntity dragon, Player player, PoseStack pose, float partialTick, CallbackInfo ci) {
-        if (DragonbornUtils.isDragonborn(player))
+        if (DragonbornUtils.isDragonborn(player) && !ShapeshiftForm.isTransformed(player))
             ci.cancel();
     }
 

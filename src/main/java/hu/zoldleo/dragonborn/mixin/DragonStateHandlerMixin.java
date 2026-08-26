@@ -44,7 +44,7 @@ public class DragonStateHandlerMixin {
     @SuppressWarnings("DataFlowIssue")
     @Inject(method = "setSpecies(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/Holder;Z)V", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/registry/attachments/PenaltySupply;clear(Lnet/minecraft/world/entity/player/Player;)V", ordinal = 0))
     private void reinsertClawToolsForDragonborn(@Nullable Player player, @Nullable Holder<DragonSpecies> species, boolean savedForSoul, CallbackInfo ci) {
-        if (DragonbornUtils.isSpeciesDragonborn(species))
+        if (DragonbornUtils.noClawSlots(species))
             ClawInventoryData.reInsertClawTools(player);
     }
 }

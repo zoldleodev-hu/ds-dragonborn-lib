@@ -24,6 +24,7 @@ import by.dragonsurvivalteam.dragonsurvival.registry.attachments.MagicData;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.TreasureRestData;
 import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import hu.zoldleo.dragonborn.common.ability.ShapeshiftForm;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -45,14 +46,14 @@ public abstract class LivingEntityMixin {
         if ((LivingEntity)(Object)this instanceof Player player) {
             if (ServerFlightHandler.distanceFromGround(player) > 1)
                 ((PlayerAccessor)player).landed(false);
-            return original || (DragonbornUtils.isDragonborn(player) && (ServerFlightHandler.isSpin(player) || (ServerFlightHandler.isGliding(player) && !((PlayerAccessor)player).landed())));
+            return original || (DragonbornUtils.isDragonborn(player) && !ShapeshiftForm.isTransformed(player) && (ServerFlightHandler.isSpin(player) || (ServerFlightHandler.isGliding(player) && !((PlayerAccessor)player).landed())));
         }
         return original;
     }
 
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isImmobile()Z"))
     private void rotateHead(CallbackInfo ci) {
-        if ((LivingEntity)(Object)this instanceof Player player && DragonbornUtils.isDragonborn(player) && isImmobile()) {
+        if ((LivingEntity)(Object)this instanceof Player player && DragonbornUtils.isDragonborn(player) && !ShapeshiftForm.isTransformed(player) && isImmobile()) {
             MagicData data = MagicData.getData(player);
             if (data.getCurrentlyCasting() != null && !data.getCurrentlyCasting().value().activation().canMoveWhileCasting())
                 player.yHeadRot = player.getYRot();
@@ -61,7 +62,7 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "getBedOrientation", at = @At("HEAD"), cancellable = true)
     private void swapBedOrientation(CallbackInfoReturnable<Direction> cir) {
-        if ((LivingEntity)(Object)this instanceof Player player && DragonbornUtils.isDragonborn(player) && TreasureRestData.getData(player).isResting())
+        if ((LivingEntity)(Object)this instanceof Player player && DragonbornUtils.isDragonborn(player) && !ShapeshiftForm.isTransformed(player) && TreasureRestData.getData(player).isResting())
             cir.setReturnValue(Direction.getNearest(player.calculateViewVector(0, ((PlayerAccessor)player).sleepDir())).getOpposite());
     }
 }

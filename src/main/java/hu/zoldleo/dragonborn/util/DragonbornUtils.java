@@ -21,7 +21,7 @@
 package hu.zoldleo.dragonborn.util;
 
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateHandler;
-import by.dragonsurvivalteam.dragonsurvival.registry.attachments.DSDataAttachments;
+import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateProvider;
 import by.dragonsurvivalteam.dragonsurvival.registry.dragon.DragonSpecies;
 import hu.zoldleo.dragonborn.Dragonborn;
 import net.minecraft.core.Holder;
@@ -36,26 +36,40 @@ public class DragonbornUtils {
     }
 
     public static boolean isDragonborn(Player player) {
-        return isDragonborn(player.getData(DSDataAttachments.DRAGON_HANDLER));
+        return isDragonborn(DragonStateProvider.getData(player));
     }
 
     public static boolean isDragonborn(@Nullable Entity entity) {
-        return entity instanceof Player player && isDragonborn(player.getData(DSDataAttachments.DRAGON_HANDLER));
+        return entity instanceof Player player && isDragonborn(DragonStateProvider.getData(player));
     }
 
     public static boolean isDragonDragonborn(DragonStateHandler handler) {
         return handler.species().is(Dragonborn.DRAGONBORN_SPECIES);
     }
 
-    public static boolean isSpeciesDragonborn(Holder<DragonSpecies> species) {
-        return species.is(Dragonborn.DRAGONBORN_SPECIES);
-    }
-
     public static boolean isDragonDragonborn(Player player) {
-        return isDragonDragonborn(player.getData(DSDataAttachments.DRAGON_HANDLER));
+        return DragonStateProvider.getData(player).species().is(Dragonborn.DRAGONBORN_SPECIES);
     }
 
     public static boolean isDragonDragonborn(@Nullable Entity entity) {
-        return entity instanceof Player player && isDragonDragonborn(player.getData(DSDataAttachments.DRAGON_HANDLER));
+        return entity instanceof Player player && DragonStateProvider.getData(player).species().is(Dragonborn.DRAGONBORN_SPECIES);
+    }
+
+    public static boolean humanCraftingGrid(Player player) {
+        Holder<DragonSpecies> species = DragonStateProvider.getData(player).species();
+        return species != null && species.is(Dragonborn.HUMAN_CRAFTING_GRID);
+    }
+
+    public static boolean noClawSlots(Player player) {
+        Holder<DragonSpecies> species = DragonStateProvider.getData(player).species();
+        return species != null && species.is(Dragonborn.NO_CLAW_SLOTS);
+    }
+
+    public static boolean noClawSlots(Holder<DragonSpecies> species) {
+        return species.is(Dragonborn.NO_CLAW_SLOTS);
+    }
+
+    public static boolean noClawSlotsDragon(DragonStateHandler handler) {
+        return handler.species().is(Dragonborn.NO_CLAW_SLOTS);
     }
 }

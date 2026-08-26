@@ -22,6 +22,7 @@ package hu.zoldleo.dragonborn.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.server.handlers.DragonRidingHandler;
 import com.llamalad7.mixinextras.sugar.Local;
+import hu.zoldleo.dragonborn.common.ability.ShapeshiftForm;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,14 +33,14 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public abstract class DragonRidingHandlerMixin {
     @ModifyVariable(method = "playerCanRideDragon", at = @At("STORE"), name = "dragonIsTooSmallToRide")
     private static boolean dragonIsTooSmallToRide(boolean dragonIsTooSmallToRide, @Local(ordinal = 0, argsOnly = true) Player rider, @Local(name = "scaleRatio") double scaleRatio) {
-        if (DragonbornUtils.isDragonborn(rider))
+        if (DragonbornUtils.isDragonborn(rider) && !ShapeshiftForm.isTransformed(rider))
             return scaleRatio >= 0.8;
         return dragonIsTooSmallToRide;
     }
 
     @ModifyVariable(method = "onRideAttempt", at = @At("STORE"), name = "ridingScaleRatio")
     private static float ridingScaleRatio(float ridingScaleRatio, @Local(name = "self") Player self) {
-        if (DragonbornUtils.isDragonborn(self))
+        if (DragonbornUtils.isDragonborn(self) && !ShapeshiftForm.isTransformed(self))
             return 0.8f;
         return ridingScaleRatio;
     }
