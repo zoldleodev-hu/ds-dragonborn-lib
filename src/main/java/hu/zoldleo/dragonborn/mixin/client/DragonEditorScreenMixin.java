@@ -117,6 +117,8 @@ public abstract class DragonEditorScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At(value = "INVOKE_ASSIGN", target = "Lby/dragonsurvivalteam/dragonsurvival/client/gui/screens/dragon_editor/DragonEditorScreen;addRenderableWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;", ordinal = 1))
     private void initShapeshiftFormArrows(CallbackInfo ci) {
+        if (dragonborn$forms.size() <= 1)
+            return;
         dragonborn$forms = ShapeshiftForm.collectDefaultForms(DragonEditorScreen.HANDLER);
         HoverButton leftArrow = new HoverButton(width / 2 - 50, 56, 10, 16, 10, 16, SMALL_LEFT_ARROW_MAIN, SMALL_LEFT_ARROW_HOVER, button -> {
             dragonborn$selectedForm = Functions.wrap(dragonborn$selectedForm - 1, 0, dragonborn$forms.size() - 1);
