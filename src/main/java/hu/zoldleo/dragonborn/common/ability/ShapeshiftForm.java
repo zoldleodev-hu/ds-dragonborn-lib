@@ -49,6 +49,7 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -166,14 +167,13 @@ public record ShapeshiftForm(Optional<ResourceLocation> icon, ResourceLocation m
     public static ArgumentBuilder<CommandSourceStack, ?> getCommand(CommandBuildContext context) {
         return Commands.literal("shapeshift")
                 .then(Commands.argument("form", new ShapeshiftArgument(context))
-                        .executes(ctx -> shapeshiftCommand(ctx, ShapeshiftArgument.get(ctx, "form")))
+                        .then(Commands.argument("target", EntityArgument.players())
+                                .executes(ctx -> shapeshiftCommand(ShapeshiftArgument.get(ctx, "form"), EntityArgument.getPlayer(ctx, "target"))))
                 );
     }
 
-    private static int shapeshiftCommand(CommandContext<CommandSourceStack> context, Holder<ShapeshiftForm> form) {
-        Player player = context.getSource().getPlayer();
-        if (player != null)
-            setForm(player, EMPTY.equals(form.value()) ? null : form);
+    private static int shapeshiftCommand(Holder<ShapeshiftForm> form, Player player) {
+        setForm(player, EMPTY.equals(form.value()) ? null : form);
         return 0;
     }
 
