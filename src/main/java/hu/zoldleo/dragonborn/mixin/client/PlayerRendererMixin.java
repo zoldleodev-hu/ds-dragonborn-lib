@@ -20,20 +20,25 @@
 
 package hu.zoldleo.dragonborn.mixin.client;
 
+import by.dragonsurvivalteam.dragonsurvival.client.gui.screens.dragon_editor.DragonEditorScreen;
 import by.dragonsurvivalteam.dragonsurvival.client.util.FakeClientPlayer;
 import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hu.zoldleo.dragonborn.client.DragonbornClientUtils;
 import hu.zoldleo.dragonborn.common.ability.ShapeshiftForm;
 import hu.zoldleo.dragonborn.util.DragonbornUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.PlayerModelPart;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -69,5 +74,15 @@ public class PlayerRendererMixin {
             return;
         if (DragonbornUtils.isDragonborn(fake.handler))
             ci.cancel();
+    }
+
+    @WrapOperation(method = "setModelProperties", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isModelPartShown(Lnet/minecraft/world/entity/player/PlayerModelPart;)Z"))
+    private boolean setFakeModelParts(AbstractClientPlayer instance, PlayerModelPart playerModelPart, Operation<Boolean> original) {
+        if (!(instance instanceof FakeClientPlayer fake) || !DragonbornUtils.isDragonborn(fake.handler))
+            return original.call(instance, playerModelPart);
+        if (DragonEditorScreen.HANDLER.equals(fake.handler))
+            //noinspection DataFlowIssue -> local player should not be null on render
+            return Minecraft.getInstance().player.isModelPartShown(playerModelPart);
+        return true;
     }
 }

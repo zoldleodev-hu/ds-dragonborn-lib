@@ -33,10 +33,24 @@ import by.dragonsurvivalteam.dragonsurvival.registry.dragon.ability.targeting.Ab
 import by.dragonsurvivalteam.dragonsurvival.registry.dragon.ability.targeting.SelfTarget;
 import by.dragonsurvivalteam.dragonsurvival.registry.dragon.body.DragonBody;
 import by.dragonsurvivalteam.dragonsurvival.registry.dragon.body.emotes.DragonEmoteSet;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import hu.zoldleo.dragonborn.Dragonborn;
+import hu.zoldleo.dragonborn.network.SyncShapeshift;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
@@ -50,11 +64,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 @EventBusSubscriber
@@ -101,12 +119,22 @@ public record ShapeshiftForm(Optional<ResourceLocation> icon, ResourceLocation m
         }
     };
 
+    public static final ShapeshiftForm EMPTY = new ShapeshiftForm(Optional.empty(), DragonSurvival.res("empty"), DragonSurvival.res("empty"), Holder.direct(new DragonEmoteSet(List.of())), new DragonBody.ScalingProportions(0, 0, 0, 0, 0, 0), 0, false);
+
     public static boolean isTransformed(Player player) {
         return player.hasData(Dragonborn.SHAPESHIFT_DATA);
     }
 
     public static Holder<ShapeshiftForm> getData(Player player) {
         return player.getData(Dragonborn.SHAPESHIFT_DATA);
+    }
+
+    public static void setForm(@NotNull Player player, @Nullable Holder<ShapeshiftForm> form) {
+        if (form == null)
+            player.removeData(Dragonborn.SHAPESHIFT_DATA);
+        else
+            player.setData(Dragonborn.SHAPESHIFT_DATA, form);
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new SyncShapeshift(player.getId()));
     }
 
     public static MutableComponent getName(Holder<ShapeshiftForm> form) {
@@ -133,5 +161,59 @@ public record ShapeshiftForm(Optional<ResourceLocation> icon, ResourceLocation m
     @SubscribeEvent
     public static void registerRegistries(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(REGISTRY, DIRECT_CODEC, DIRECT_CODEC);
+    }
+
+    public static ArgumentBuilder<CommandSourceStack, ?> getCommand(CommandBuildContext context) {
+        return Commands.literal("shapeshift")
+                .then(Commands.argument("form", new ShapeshiftArgument(context))
+                        .executes(ctx -> shapeshiftCommand(ctx, ShapeshiftArgument.get(ctx, "form")))
+                );
+    }
+
+    private static int shapeshiftCommand(CommandContext<CommandSourceStack> context, Holder<ShapeshiftForm> form) {
+        Player player = context.getSource().getPlayer();
+        if (player != null)
+            setForm(player, EMPTY.equals(form.value()) ? null : form);
+        return 0;
+    }
+
+    public static class ShapeshiftArgument implements ArgumentType<Holder<ShapeshiftForm>> {
+        private static final ResourceLocation DEFAULT_LOCATION = ResourceLocation.fromNamespaceAndPath(Dragonborn.MODID, "default");
+        private final HolderLookup.RegistryLookup<ShapeshiftForm> lookup;
+
+        public ShapeshiftArgument(CommandBuildContext context) {
+            lookup = context.lookupOrThrow(REGISTRY);
+        }
+
+        @Override
+        public @Nullable Holder<ShapeshiftForm> parse(StringReader reader) throws CommandSyntaxException {
+            try {
+                int start = reader.getCursor();
+                ResourceLocation id = ResourceLocation.read(reader);
+                if (DEFAULT_LOCATION.equals(id))
+                    return Holder.direct(EMPTY);
+                Optional<Holder.Reference<ShapeshiftForm>> form = lookup.get(ResourceKey.create(REGISTRY, id));
+                if (form.isEmpty()) {
+                    reader.setCursor(start);
+                    throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().createWithContext(reader);
+                }
+                return form.get();
+            } catch (ResourceLocationException exception) {
+                throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().createWithContext(reader);
+            }
+        }
+
+        @Override
+        public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+            List<String> suggestions = new ArrayList<>();
+            lookup.listElementIds().forEach(element -> suggestions.add(element.location().toString()));
+            suggestions.add(DEFAULT_LOCATION.toString());
+            return SharedSuggestionProvider.suggest(suggestions, builder);
+        }
+
+        public static Holder<ShapeshiftForm> get(CommandContext<?> context, String name) {
+            //noinspection unchecked
+            return context.getArgument(name, Holder.class);
+        }
     }
 }

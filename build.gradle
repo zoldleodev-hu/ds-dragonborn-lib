@@ -18,6 +18,7 @@ version = mod_version
 group = mod_group_id
 
 repositories {
+    mavenLocal()
     /*maven {
         name = 'GeckoLib'
         url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
@@ -27,6 +28,10 @@ repositories {
     }*/
     maven { url = "https://maven.bawnorton.com/releases" }
     maven { url = "https://cursemaven.com" }
+    maven {
+        name = "RedlanceMinecraft"
+        url = uri("https://repo.redlance.org/public")
+    }
     /*maven {
         name = "Mojang"
         url = "https://minecraft.net"
@@ -135,6 +140,7 @@ dependencies {
     implementation "libs:DragonSurvival-1.21.1-v2.0.66-23.08.2026-all"
     compileOnly(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.7-beta.3"))
     implementation(jarJar("com.github.bawnorton.mixinsquared:mixinsquared-neoforge:0.3.7-beta.3"))
+    //implementation "com.zigythebird.playeranim:PlayerAnimationLibNeo:$pal_version"
     //implementation 'com.mojang:datafixers:8.0.16'
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

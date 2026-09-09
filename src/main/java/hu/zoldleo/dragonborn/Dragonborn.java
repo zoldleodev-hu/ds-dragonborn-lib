@@ -24,8 +24,12 @@ import by.dragonsurvivalteam.dragonsurvival.DragonSurvival;
 import by.dragonsurvivalteam.dragonsurvival.registry.dragon.DragonSpecies;
 import by.dragonsurvivalteam.dragonsurvival.registry.dragon.ability.entity_effects.AbilityEntityEffect;
 import by.dragonsurvivalteam.dragonsurvival.registry.dragon.body.DragonBody;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+//import com.zigythebird.playeranim.animation.PlayerAnimationController;
+//import com.zigythebird.playeranim.api.PlayerAnimationFactory;
 import hu.zoldleo.dragonborn.client.DragonbornRenderLayer;
+import hu.zoldleo.dragonborn.client.PlayerAnimHandler;
 import hu.zoldleo.dragonborn.common.ability.ShapeshiftAbilityEffect;
 import hu.zoldleo.dragonborn.common.ability.ShapeshiftForm;
 import hu.zoldleo.dragonborn.common.ability.ShapeshiftPredicate;
@@ -33,6 +37,10 @@ import hu.zoldleo.dragonborn.network.SyncShapeshift;
 import net.minecraft.advancements.critereon.EntitySubPredicate;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.commands.synchronization.ArgumentTypeInfos;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -41,13 +49,21 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+//import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.neoforged.neoforge.registries.datamaps.AdvancedDataMapType;
+import net.neoforged.neoforge.registries.datamaps.DataMapValueMerger;
+import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
+
+import java.util.Map;
 
 @Mod(Dragonborn.MODID)
 public class Dragonborn {
@@ -62,26 +78,46 @@ public class Dragonborn {
     public static final DeferredRegister<MapCodec<? extends AbilityEntityEffect>> ABILITIES = DeferredRegister.create(AbilityEntityEffect.REGISTRY_KEY, Dragonborn.MODID);
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Dragonborn.MODID);
     public static final DeferredRegister<MapCodec<? extends EntitySubPredicate>> PREDICATES = DeferredRegister.create(BuiltInRegistries.ENTITY_SUB_PREDICATE_TYPE, MODID);
+    public static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGMENTS = DeferredRegister.create(BuiltInRegistries.COMMAND_ARGUMENT_TYPE, MODID);
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<Holder<ShapeshiftForm>>> SHAPESHIFT_DATA = ATTACHMENTS.register("shapeshift_data", () -> AttachmentType.<Holder<ShapeshiftForm>>builder(() -> null).serialize(ShapeshiftForm.CODEC).sync(ShapeshiftForm.STREAM_CODEC).build());
+    public static final AdvancedDataMapType<DragonBody, Map<String, ResourceLocation>, PlayerAnimHandler.DataMapAnimRemover> PLAYER_EMOTE_DATAMAP = AdvancedDataMapType.builder(ResourceLocation.fromNamespaceAndPath(MODID, "player_emotes"), DragonBody.REGISTRY, Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC)).synced(Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC), false).merger(DataMapValueMerger.mapMerger()).remover(PlayerAnimHandler.DataMapAnimRemover.CODEC).build();
 
     public Dragonborn(IEventBus modEventBus) {
         ABILITIES.register(modEventBus);
         ATTACHMENTS.register(modEventBus);
         PREDICATES.register(modEventBus);
+        COMMAND_ARGMENTS.register(modEventBus);
+
+        NeoForge.EVENT_BUS.addListener(Dragonborn::registerCommands);
 
         modEventBus.addListener(Dragonborn::registerPayloads);
-        if (FMLEnvironment.dist == Dist.CLIENT)
+        modEventBus.addListener(Dragonborn::registerDataMaps);
+        if (FMLEnvironment.dist == Dist.CLIENT) {
             modEventBus.addListener(ClientEvents::registerRenderLayers);
+            //modEventBus.addListener(ClientEvents::onClientSetup);
+        }
     }
 
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
         event.registrar("1").playToClient(SyncShapeshift.TYPE, SyncShapeshift.STREAM_CODEC, SyncShapeshift::handleClient);
     }
 
+    public static void registerDataMaps(RegisterDataMapTypesEvent event) {
+        event.register(PLAYER_EMOTE_DATAMAP);
+    }
+
+    public static void registerCommands(RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("dragonborn-lib")
+                .requires((context) -> context.hasPermission(2))
+                .then(ShapeshiftForm.getCommand(event.getBuildContext()))
+        );
+    }
+
     static {
         ABILITIES.register("shapeshift", () -> ShapeshiftAbilityEffect.CODEC);
         PREDICATES.register("shapeshift_predicate", () -> ShapeshiftPredicate.CODEC);
+        COMMAND_ARGMENTS.register("shapeshift_form", () -> ArgumentTypeInfos.registerByClass(ShapeshiftForm.ShapeshiftArgument.class, SingletonArgumentInfo.contextAware(ShapeshiftForm.ShapeshiftArgument::new)));
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -93,5 +129,17 @@ public class Dragonborn {
                 if (event.getSkin(model) instanceof PlayerRenderer renderer)
                     renderer.addLayer(new DragonbornRenderLayer(renderer));
         }
+
+        /*/public static void onClientSetup(FMLClientSetupEvent event) { // TODO: ability animations
+            event.enqueueWork(() -> {
+                for (int slot = 0; slot < 4; slot++) {
+                    int finalSlot = slot;
+                    PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(ResourceLocation.fromNamespaceAndPath(MODID, "emote_" + slot), 1000,
+                            player -> new PlayerAnimationController(player, (controller, state, animSetter) -> PlayerAnimHandler.emotePredicate(controller, state, animSetter, finalSlot)));
+                }
+                PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(ResourceLocation.fromNamespaceAndPath(MODID, "ability"), 1100,
+                        player -> new PlayerAnimationController(player, PlayerAnimHandler::animationPredicate));
+            });
+        }*/
     }
 }
