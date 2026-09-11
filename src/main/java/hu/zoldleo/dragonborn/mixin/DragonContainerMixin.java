@@ -51,7 +51,7 @@ public class DragonContainerMixin {
     @Final
     public Player player;
 
-    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/server/containers/DragonContainer;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 5))
+    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lby/dragonsurvivalteam/dragonsurvival/server/containers/DragonContainer;addDataSlots(Lnet/minecraft/world/inventory/ContainerData;)V"))
     private void reduceCraftingGridSize(int id, Inventory inventory, CallbackInfo ci) {
         if (DragonbornUtils.humanCraftingGrid(player))
             craftMatrix = new TransientCraftingContainer((DragonContainer)(Object)this, 2, 2);
